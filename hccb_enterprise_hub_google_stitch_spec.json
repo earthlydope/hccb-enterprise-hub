@@ -1,0 +1,1854 @@
+{
+  "schema_version": "1.0.0",
+  "project": {
+    "id": "hccb-enterprise-experience-hub",
+    "name": "HCCB Enterprise Experience Hub",
+    "tagline": "Transforming Employee Experience Through a Unified Digital Workplace",
+    "app_type": "enterprise_employee_experience_platform",
+    "generation_target": "Google Stitch",
+    "primary_platforms": [
+      "responsive_web",
+      "mobile_web",
+      "teams_embedded_experience"
+    ],
+    "business_objective": "Create one intelligent, mobile-first digital workplace connecting employees to information, services, applications, collaboration, analytics and AI.",
+    "source_scope": [
+      "Employee Engagement Dashboard 1(1).docx",
+      "HCCB_Enterprise_Hub_Executive_Deck(1).pptx"
+    ],
+    "source_fidelity_rule": "Use source-derived features and terminology as authoritative. Where implementation details are not specified in the source, use the recommendations explicitly marked as recommended_or_inferred.",
+    "stitch_master_instruction": "Design and prototype a production-grade HCCB Enterprise Experience Hub. The product must feel like a premium enterprise employee super-app rather than a document intranet. Build all screens, responsive states, navigation, interactions, empty/loading/error states, mobile variants, role-aware personalization, AI assistant flows, global search, employee self-service, approvals, news, learning, recognition, communities, analytics and application launchers described in this JSON. Use the official HCCB visual identity derived from https://www.hccb.in/ and never redraw or approximate the HCCB logo. Use official vendor/product logos only when the vendor is explicitly named. Make the experience mobile-first for frontline and field employees while remaining excellent on desktop."
+  },
+  "branding": {
+    "brand_name": "HCCB",
+    "full_name": "Hindustan Coca-Cola Beverages Pvt. Ltd.",
+    "brand_reference_url": "https://www.hccb.in/",
+    "logo": {
+      "usage": "official_only",
+      "instruction": "Extract/use the official HCCB logo from the HCCB brand/reference URL or an approved supplied asset. Do not recreate the logo as text, SVG paths or an AI-generated approximation.",
+      "placement": {
+        "desktop": "top-left of global header",
+        "mobile": "top-left compact header",
+        "login": "centered above sign-in card"
+      },
+      "clear_space": "minimum 16px around the rendered mark",
+      "background_rule": "Prefer white or high-contrast neutral surfaces behind the official logo."
+    },
+    "design_system_source": {
+      "mode": "derive_from_reference_url",
+      "url": "https://www.hccb.in/",
+      "extract": [
+        "brand colors",
+        "typographic character",
+        "button character",
+        "corner radius cues",
+        "image treatment"
+      ],
+      "do_not_copy": [
+        "marketing-site layout",
+        "public-site navigation"
+      ],
+      "fallback_if_extraction_unavailable": {
+        "primary": "#F40009",
+        "surface": "#FFFFFF",
+        "text_primary": "#171717",
+        "text_secondary": "#5F6368",
+        "border": "#E7E7E7",
+        "background": "#F7F7F8",
+        "note": "Fallback palette only; official extracted brand tokens take precedence."
+      }
+    },
+    "visual_direction": {
+      "keywords": [
+        "modern enterprise",
+        "premium",
+        "clean",
+        "people-first",
+        "high information clarity",
+        "mobile-first",
+        "warm but professional",
+        "modular employee super-app"
+      ],
+      "avoid": [
+        "dense legacy intranet layout",
+        "excessive gradients",
+        "neon styling",
+        "cartoon illustrations",
+        "overuse of Coca-Cola beverage imagery",
+        "generic SaaS purple/blue branding",
+        "tiny dashboard typography"
+      ],
+      "surface_style": "white cards on soft-neutral background, strong hierarchy, restrained shadows, generous spacing",
+      "icon_style": "rounded enterprise line/filled icons; official product logos kept unmodified"
+    }
+  },
+  "official_and_product_assets": {
+    "rules": [
+      "Use official product logos where a product/vendor is explicitly named.",
+      "Do not recolor vendor logos unless the vendor's official monochrome variant is used.",
+      "Do not infer a specific CRM, ERP, DMS or LMS vendor when the source is generic.",
+      "For unspecified systems, use a neutral application icon and the source label such as CRM, ERP, DMS or LMS."
+    ],
+    "assets": [
+      {
+        "id": "hccb",
+        "label": "HCCB",
+        "type": "brand_logo",
+        "source": "official HCCB reference URL",
+        "required": true
+      },
+      {
+        "id": "sharepoint",
+        "label": "SharePoint",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "viva_connections",
+        "label": "Viva Connections",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "viva_engage",
+        "label": "Viva Engage",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "viva_learning",
+        "label": "Viva Learning",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "viva_insights",
+        "label": "Viva Insights",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "teams",
+        "label": "Microsoft Teams",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "power_apps",
+        "label": "Power Apps",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "power_automate",
+        "label": "Power Automate",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "power_bi",
+        "label": "Power BI",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "onedrive",
+        "label": "OneDrive",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "sap",
+        "label": "SAP",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "servicenow",
+        "label": "ServiceNow",
+        "type": "official_product_logo",
+        "required": true
+      },
+      {
+        "id": "crm_generic",
+        "label": "CRM",
+        "type": "generic_system_icon",
+        "required": true
+      },
+      {
+        "id": "erp_generic",
+        "label": "ERP",
+        "type": "generic_system_icon",
+        "required": true
+      },
+      {
+        "id": "dms_generic",
+        "label": "Distributor Management System",
+        "type": "generic_system_icon",
+        "required": true
+      },
+      {
+        "id": "lms_generic",
+        "label": "Learning Management System",
+        "type": "generic_system_icon",
+        "required": true
+      }
+    ]
+  },
+  "personas": [
+    {
+      "id": "corporate_employee",
+      "label": "Corporate Employee",
+      "needs": [
+        "news",
+        "HR self-service",
+        "documents",
+        "approvals",
+        "learning",
+        "applications",
+        "search",
+        "AI help"
+      ]
+    },
+    {
+      "id": "frontline_employee",
+      "label": "Frontline / Plant Employee",
+      "needs": [
+        "mobile-first access",
+        "plant SOPs",
+        "shift-relevant information",
+        "training",
+        "recognition",
+        "IT/HR requests",
+        "notifications"
+      ]
+    },
+    {
+      "id": "field_sales_employee",
+      "label": "Field Sales Executive",
+      "needs": [
+        "mobile-first access",
+        "sales tools",
+        "market intelligence",
+        "territory analytics",
+        "approvals",
+        "news",
+        "training"
+      ]
+    },
+    {
+      "id": "warehouse_employee",
+      "label": "Warehouse Staff",
+      "needs": [
+        "mobile access",
+        "SOPs",
+        "operations information",
+        "service requests",
+        "learning",
+        "announcements"
+      ]
+    },
+    {
+      "id": "manager",
+      "label": "People Manager",
+      "needs": [
+        "team approvals",
+        "team learning status",
+        "recognition",
+        "announcements",
+        "analytics",
+        "service status"
+      ]
+    },
+    {
+      "id": "content_owner",
+      "label": "Content Owner",
+      "needs": [
+        "publish",
+        "approval workflows",
+        "content review dates",
+        "archive",
+        "audit trail"
+      ]
+    },
+    {
+      "id": "platform_admin",
+      "label": "Platform Administrator",
+      "needs": [
+        "integration status",
+        "permissions",
+        "content governance",
+        "audit reporting",
+        "usage analytics"
+      ]
+    }
+  ],
+  "content_ownership": [
+    {
+      "area": "HR",
+      "owner": "HR Team"
+    },
+    {
+      "area": "IT",
+      "owner": "IT Team"
+    },
+    {
+      "area": "Sales",
+      "owner": "Sales Excellence"
+    },
+    {
+      "area": "Manufacturing",
+      "owner": "Operations"
+    },
+    {
+      "area": "Corporate News",
+      "owner": "Communications Team"
+    }
+  ],
+  "information_architecture": {
+    "primary_navigation": [
+      {
+        "id": "home",
+        "label": "Home",
+        "icon": "home"
+      },
+      {
+        "id": "my_workspace",
+        "label": "My Workspace",
+        "icon": "dashboard"
+      },
+      {
+        "id": "services",
+        "label": "Services",
+        "icon": "grid"
+      },
+      {
+        "id": "knowledge",
+        "label": "Knowledge",
+        "icon": "book"
+      },
+      {
+        "id": "learning",
+        "label": "Learning",
+        "icon": "graduation-cap"
+      },
+      {
+        "id": "communities",
+        "label": "Communities",
+        "icon": "users"
+      },
+      {
+        "id": "analytics",
+        "label": "Analytics",
+        "icon": "chart"
+      },
+      {
+        "id": "ai_assistant",
+        "label": "AI Assistant",
+        "icon": "sparkles"
+      }
+    ],
+    "secondary_destinations": [
+      "Company News",
+      "Leadership Corner",
+      "HR Services",
+      "Learning Hub",
+      "IT Support",
+      "Sales Hub",
+      "Manufacturing Hub",
+      "Supply Chain Hub",
+      "Policies & SOPs",
+      "Employee Communities",
+      "Recognition Center",
+      "Analytics Dashboard",
+      "AI Assistant"
+    ],
+    "desktop_pattern": "persistent left navigation + top utility bar",
+    "mobile_pattern": "bottom navigation with Home, Services, Search, Notifications, Profile; secondary destinations open from More/Services",
+    "global_utilities": [
+      "global search",
+      "notifications",
+      "application launcher",
+      "AI assistant entry",
+      "employee profile",
+      "language selector placeholder",
+      "help"
+    ]
+  },
+  "global_components": {
+    "top_header": {
+      "elements": [
+        "HCCB logo",
+        "global search",
+        "AI ask button",
+        "notifications",
+        "app launcher",
+        "profile avatar"
+      ],
+      "sticky": true
+    },
+    "global_search": {
+      "placeholder": "Search policies, SOPs, people, news, apps and services",
+      "supports_natural_language": true,
+      "example_queries": [
+        "Leave policy",
+        "Travel reimbursement",
+        "Sales incentive scheme",
+        "Plant safety SOP"
+      ],
+      "filters": [
+        "All",
+        "Policies & SOPs",
+        "News",
+        "People",
+        "Applications",
+        "Learning",
+        "Communities"
+      ],
+      "result_features": [
+        "type icon",
+        "title",
+        "snippet",
+        "source",
+        "last updated",
+        "open action",
+        "AI summary action"
+      ]
+    },
+    "notification_center": {
+      "categories": [
+        "Approvals",
+        "Company",
+        "Learning",
+        "Recognition",
+        "Service Requests",
+        "Communities"
+      ],
+      "actions": [
+        "mark read",
+        "mark all read",
+        "open source",
+        "dismiss"
+      ]
+    },
+    "app_launcher": {
+      "layout": "searchable icon grid",
+      "apps": [
+        "SAP",
+        "CRM",
+        "HR Portal",
+        "Distributor Management System",
+        "Power BI",
+        "ServiceNow",
+        "Learning Management System"
+      ]
+    },
+    "toast_system": {
+      "types": [
+        "success",
+        "info",
+        "warning",
+        "error"
+      ],
+      "auto_dismiss_ms": 4500
+    }
+  },
+  "screens": [
+    {
+      "id": "splash_and_sign_in",
+      "name": "Secure Sign In",
+      "route": "/login",
+      "source_status": "recommended_or_inferred",
+      "purpose": "Enterprise entry point with SSO-first experience.",
+      "layout": [
+        "official HCCB logo",
+        "welcome statement",
+        "single sign-on button",
+        "help link"
+      ],
+      "copy": {
+        "title": "Welcome to HCCB Enterprise Hub",
+        "subtitle": "One place for your work, services, knowledge and updates.",
+        "primary_cta": "Continue with work account"
+      },
+      "behavior": [
+        "redirect authenticated users to personalized home",
+        "support session timeout state"
+      ]
+    },
+    {
+      "id": "home",
+      "name": "Personalized Home",
+      "route": "/",
+      "source_status": "source_derived",
+      "purpose": "The employee's digital front door.",
+      "desktop_sections": [
+        "personalized greeting",
+        "priority tasks and pending approvals",
+        "quick actions",
+        "my applications",
+        "company news",
+        "sales/role-relevant dashboard card",
+        "upcoming events",
+        "learning recommendations",
+        "recognition highlights",
+        "AI assistant prompt"
+      ],
+      "hero": {
+        "greeting_template": "Good {daypart}, {first_name}",
+        "context_chips": [
+          "location",
+          "department"
+        ],
+        "demo_name": "Avinash",
+        "primary_status_card": {
+          "label": "Today's Tasks",
+          "demo_metric": "5 Pending Approvals",
+          "cta": "Review approvals"
+        }
+      },
+      "quick_actions": [
+        "Request Leave",
+        "Raise IT Ticket",
+        "Download Payslip",
+        "Book Travel",
+        "Apply Internal Job"
+      ],
+      "personalization_rules": [
+        "Prioritize role-specific application tiles.",
+        "Show only relevant analytics cards.",
+        "Use location and department to rank news and events.",
+        "Frontline users see larger tap targets and fewer simultaneous widgets."
+      ]
+    },
+    {
+      "id": "my_workspace",
+      "name": "My Workspace",
+      "route": "/workspace",
+      "source_status": "source_derived",
+      "modules": [
+        {
+          "name": "Payslips",
+          "type": "document_list"
+        },
+        {
+          "name": "Leave Balance",
+          "type": "balance_card"
+        },
+        {
+          "name": "Expense Claims",
+          "type": "status_list"
+        },
+        {
+          "name": "My Documents",
+          "type": "document_library"
+        },
+        {
+          "name": "Training Status",
+          "type": "progress_list"
+        }
+      ],
+      "summary_cards": [
+        "leave available",
+        "pending claims",
+        "documents",
+        "learning completion"
+      ]
+    },
+    {
+      "id": "approvals",
+      "name": "Approvals",
+      "route": "/approvals",
+      "source_status": "recommended_or_inferred",
+      "filters": [
+        "Pending",
+        "Approved",
+        "Rejected",
+        "Delegated"
+      ],
+      "approval_types": [
+        "Leave",
+        "Purchase",
+        "Travel",
+        "HR Workflow",
+        "Other"
+      ],
+      "detail_panel": [
+        "requester",
+        "request type",
+        "submitted time",
+        "supporting information",
+        "timeline",
+        "approve",
+        "reject",
+        "request changes"
+      ]
+    },
+    {
+      "id": "company_news",
+      "name": "Company News",
+      "route": "/news",
+      "source_status": "source_derived",
+      "content_types": [
+        "CEO messages",
+        "Leadership updates",
+        "Company announcements",
+        "News and events",
+        "Townhall recordings"
+      ],
+      "features": [
+        "featured story",
+        "latest feed",
+        "category filters",
+        "bookmark",
+        "share to Teams",
+        "read-time",
+        "video/townhall card"
+      ]
+    },
+    {
+      "id": "leadership_corner",
+      "name": "Leadership Corner",
+      "route": "/leadership",
+      "source_status": "source_derived",
+      "features": [
+        "CEO messages",
+        "leadership updates",
+        "townhall recordings",
+        "featured priorities"
+      ]
+    },
+    {
+      "id": "hr_services",
+      "name": "HR Services",
+      "route": "/services/hr",
+      "source_status": "source_derived",
+      "service_tiles": [
+        "Leave Management",
+        "Attendance",
+        "Payroll Access",
+        "Employee Letters",
+        "Travel Requests",
+        "Internal Jobs"
+      ],
+      "features": [
+        "search services",
+        "recent requests",
+        "service status tracker",
+        "frequently used actions"
+      ]
+    },
+    {
+      "id": "it_support",
+      "name": "IT Support",
+      "route": "/services/it",
+      "source_status": "source_derived",
+      "features": [
+        "raise helpdesk ticket",
+        "ticket status",
+        "popular fixes",
+        "service alerts",
+        "ServiceNow deep link"
+      ],
+      "ticket_form": [
+        "category",
+        "issue summary",
+        "description",
+        "priority",
+        "attachment",
+        "device/application"
+      ]
+    },
+    {
+      "id": "knowledge_hub",
+      "name": "Knowledge Hub",
+      "route": "/knowledge",
+      "source_status": "source_derived",
+      "collections": [
+        "SOPs",
+        "Policies",
+        "Compliance Documents",
+        "Sales Playbooks",
+        "Technical Manuals",
+        "HR Documents"
+      ],
+      "features": [
+        "searchable knowledge base",
+        "filter by department",
+        "filter by content type",
+        "recently updated",
+        "most used",
+        "AI summarize",
+        "bookmark",
+        "content owner",
+        "last reviewed date"
+      ]
+    },
+    {
+      "id": "document_detail",
+      "name": "Policy / SOP Detail",
+      "route": "/knowledge/:documentId",
+      "source_status": "recommended_or_inferred",
+      "features": [
+        "document title",
+        "owner",
+        "version",
+        "effective date",
+        "last reviewed",
+        "content viewer",
+        "table of contents",
+        "AI summary",
+        "related documents",
+        "acknowledgement action",
+        "download where permitted"
+      ]
+    },
+    {
+      "id": "learning_hub",
+      "name": "Learning Hub",
+      "route": "/learning",
+      "source_status": "source_derived",
+      "features": [
+        "assigned learning",
+        "recommended learning",
+        "learning aggregation",
+        "completion progress",
+        "due dates",
+        "certificates",
+        "training search"
+      ]
+    },
+    {
+      "id": "sales_hub",
+      "name": "Sales Hub",
+      "route": "/sales",
+      "source_status": "source_derived",
+      "modules": [
+        "Sales Tools",
+        "Sales Visit Reporting",
+        "Market Intelligence",
+        "Territory Analytics",
+        "Sales Performance",
+        "Sales Playbooks",
+        "Sales Incentive Information"
+      ],
+      "role_visibility": [
+        "field_sales_employee",
+        "manager",
+        "sales content owner"
+      ]
+    },
+    {
+      "id": "manufacturing_hub",
+      "name": "Manufacturing Hub",
+      "route": "/manufacturing",
+      "source_status": "source_derived",
+      "modules": [
+        "Plant News",
+        "Plant Safety SOPs",
+        "Technical Manuals",
+        "Plant Productivity",
+        "Asset Management",
+        "Training",
+        "Employee Service Requests"
+      ],
+      "role_visibility": [
+        "frontline_employee",
+        "warehouse_employee",
+        "manager",
+        "operations content owner"
+      ]
+    },
+    {
+      "id": "supply_chain_hub",
+      "name": "Supply Chain Hub",
+      "route": "/supply-chain",
+      "source_status": "source_derived",
+      "modules": [
+        "Operations Updates",
+        "Policies & SOPs",
+        "Distributor Management System",
+        "Analytics",
+        "Training",
+        "Service Requests"
+      ]
+    },
+    {
+      "id": "communities",
+      "name": "Employee Communities",
+      "route": "/communities",
+      "source_status": "source_derived",
+      "features": [
+        "Viva Engage community feed",
+        "department communities",
+        "project collaboration areas",
+        "discussion forums",
+        "join/leave community",
+        "create post",
+        "react/comment",
+        "pinned posts"
+      ]
+    },
+    {
+      "id": "recognition",
+      "name": "Recognition Center",
+      "route": "/recognition",
+      "source_status": "source_derived",
+      "features": [
+        "Rewards & Recognition",
+        "peer recognition",
+        "manager recognition",
+        "birthday celebrations",
+        "anniversary celebrations",
+        "gamification",
+        "recognition feed"
+      ]
+    },
+    {
+      "id": "surveys_and_polls",
+      "name": "Surveys & Polls",
+      "route": "/engage/surveys",
+      "source_status": "source_derived",
+      "features": [
+        "active surveys",
+        "quick polls",
+        "participation status",
+        "anonymous mode where configured",
+        "result summary where permitted"
+      ]
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics Dashboard",
+      "route": "/analytics",
+      "source_status": "source_derived",
+      "dashboard_groups": [
+        "Sales Performance",
+        "Plant Productivity",
+        "Territory Analytics"
+      ],
+      "features": [
+        "Power BI embedded card/tiles",
+        "role-aware dashboard catalog",
+        "recent dashboards",
+        "favorites",
+        "open full report"
+      ]
+    },
+    {
+      "id": "ai_assistant",
+      "name": "AI Knowledge Assistant",
+      "route": "/assistant",
+      "source_status": "source_derived",
+      "purpose": "Natural-language workplace assistant using enterprise knowledge and connected services.",
+      "starter_prompts": [
+        "What is the travel policy?",
+        "How do I apply for transfer?",
+        "What are Q4 sales targets?",
+        "Show me onboarding documents."
+      ],
+      "capabilities": [
+        "enterprise search",
+        "policy Q&A",
+        "knowledge retrieval",
+        "content summarization",
+        "announcement summarization",
+        "meeting-note summarization",
+        "personalized training recommendations",
+        "community recommendations",
+        "document recommendations",
+        "internal opportunity recommendations",
+        "self-service guidance"
+      ],
+      "response_pattern": [
+        "direct answer",
+        "source cards",
+        "related actions",
+        "open source",
+        "copy answer",
+        "thumbs up/down"
+      ],
+      "guardrails": [
+        "Never expose content the employee cannot access.",
+        "Always show source provenance for knowledge answers.",
+        "For transactional requests, confirm intent before final submission.",
+        "State when no authoritative enterprise source is available."
+      ]
+    },
+    {
+      "id": "search_results",
+      "name": "Enterprise Search",
+      "route": "/search",
+      "source_status": "source_derived",
+      "sources": [
+        "SharePoint",
+        "Teams",
+        "OneDrive",
+        "Knowledge Articles",
+        "HR Documents"
+      ],
+      "features": [
+        "natural-language query",
+        "instant results",
+        "facets",
+        "recent searches",
+        "suggestions",
+        "AI overview",
+        "result source badges"
+      ]
+    },
+    {
+      "id": "application_catalog",
+      "name": "Business Applications",
+      "route": "/apps",
+      "source_status": "source_derived",
+      "apps": [
+        {
+          "name": "SAP",
+          "logo": "sap",
+          "launch_mode": "deep_link_or_embedded"
+        },
+        {
+          "name": "CRM",
+          "logo": "crm_generic",
+          "launch_mode": "deep_link_or_embedded"
+        },
+        {
+          "name": "Sales Tools",
+          "logo": "generic_sales",
+          "launch_mode": "deep_link_or_embedded"
+        },
+        {
+          "name": "Distributor Management System",
+          "logo": "dms_generic",
+          "launch_mode": "deep_link_or_embedded"
+        },
+        {
+          "name": "Power BI",
+          "logo": "power_bi",
+          "launch_mode": "embedded_or_deep_link"
+        },
+        {
+          "name": "ServiceNow",
+          "logo": "servicenow",
+          "launch_mode": "deep_link"
+        },
+        {
+          "name": "Learning Management System",
+          "logo": "lms_generic",
+          "launch_mode": "deep_link_or_embedded"
+        }
+      ],
+      "features": [
+        "search apps",
+        "favorites",
+        "recently used",
+        "role-based visibility"
+      ]
+    },
+    {
+      "id": "profile",
+      "name": "My Profile",
+      "route": "/profile",
+      "source_status": "recommended_or_inferred",
+      "fields": [
+        "name",
+        "employee ID",
+        "department",
+        "location",
+        "manager",
+        "role",
+        "profile photo"
+      ],
+      "settings": [
+        "notification preferences",
+        "accessibility preferences",
+        "language placeholder",
+        "privacy/help links"
+      ]
+    },
+    {
+      "id": "admin_governance",
+      "name": "Content Governance",
+      "route": "/admin/governance",
+      "source_status": "source_derived",
+      "role_visibility": [
+        "content_owner",
+        "platform_admin"
+      ],
+      "features": [
+        "content owner matrix",
+        "items due for review",
+        "3-month review cadence",
+        "archive outdated content",
+        "approval workflows",
+        "audit reporting",
+        "content health indicators"
+      ]
+    }
+  ],
+  "service_and_workflow_flows": [
+    {
+      "id": "leave_request",
+      "trigger": "Request Leave",
+      "steps": [
+        "Open leave request form",
+        "Show current leave balance",
+        "Select leave type",
+        "Select date range",
+        "Add optional note",
+        "Review request",
+        "Submit",
+        "Show confirmation and status tracking"
+      ]
+    },
+    {
+      "id": "it_ticket",
+      "trigger": "Raise IT Ticket",
+      "steps": [
+        "Select issue category",
+        "Describe issue",
+        "Attach screenshot/file if needed",
+        "Choose affected device/application",
+        "Submit",
+        "Show ticket number and ServiceNow status",
+        "Notify on updates"
+      ]
+    },
+    {
+      "id": "payslip",
+      "trigger": "Download Payslip",
+      "steps": [
+        "Open payslip list",
+        "Select month/year",
+        "Preview",
+        "Download if authorized"
+      ]
+    },
+    {
+      "id": "travel_request",
+      "trigger": "Book Travel",
+      "steps": [
+        "Open travel request",
+        "Enter trip details",
+        "Review policy guidance",
+        "Submit for approval",
+        "Track status"
+      ]
+    },
+    {
+      "id": "internal_job",
+      "trigger": "Apply Internal Job",
+      "steps": [
+        "Browse internal roles",
+        "Open role",
+        "Check eligibility",
+        "Apply",
+        "Track application"
+      ]
+    },
+    {
+      "id": "content_review",
+      "trigger": "Content review due",
+      "steps": [
+        "Notify owner",
+        "Open content health detail",
+        "Review accuracy",
+        "Update or confirm",
+        "Route for approval if needed",
+        "Publish/archive",
+        "Write audit event"
+      ]
+    }
+  ],
+  "integrations": {
+    "source_derived": [
+      {
+        "name": "SharePoint Online",
+        "purpose": [
+          "intranet foundation",
+          "news",
+          "content management",
+          "document libraries",
+          "department portals"
+        ]
+      },
+      {
+        "name": "Viva Connections",
+        "purpose": [
+          "employee dashboard",
+          "home page",
+          "Teams-connected employee experience"
+        ]
+      },
+      {
+        "name": "Viva Engage",
+        "purpose": [
+          "community discussions",
+          "engagement"
+        ]
+      },
+      {
+        "name": "Viva Learning",
+        "purpose": [
+          "learning aggregation"
+        ]
+      },
+      {
+        "name": "Viva Insights",
+        "purpose": [
+          "productivity and wellbeing insights"
+        ]
+      },
+      {
+        "name": "Microsoft Teams",
+        "purpose": [
+          "hub access",
+          "collaboration",
+          "mobile access"
+        ]
+      },
+      {
+        "name": "Power Apps",
+        "purpose": [
+          "sales visit reporting",
+          "market intelligence",
+          "asset management",
+          "employee service requests"
+        ]
+      },
+      {
+        "name": "Power Automate",
+        "purpose": [
+          "leave approvals",
+          "purchase approvals",
+          "HR workflows"
+        ]
+      },
+      {
+        "name": "Power BI",
+        "purpose": [
+          "sales performance",
+          "plant productivity",
+          "territory analytics"
+        ]
+      },
+      {
+        "name": "Microsoft Search / Copilot",
+        "purpose": [
+          "AI-powered enterprise search",
+          "summaries",
+          "recommendations",
+          "self-service assistance"
+        ]
+      },
+      {
+        "name": "OneDrive",
+        "purpose": [
+          "enterprise search source",
+          "documents"
+        ]
+      },
+      {
+        "name": "SAP",
+        "purpose": [
+          "business application access"
+        ]
+      },
+      {
+        "name": "CRM",
+        "purpose": [
+          "business application access"
+        ],
+        "vendor": "unspecified"
+      },
+      {
+        "name": "ERP",
+        "purpose": [
+          "business application integration"
+        ],
+        "vendor": "unspecified"
+      },
+      {
+        "name": "Distributor Management System",
+        "purpose": [
+          "business application access"
+        ],
+        "vendor": "unspecified"
+      },
+      {
+        "name": "ServiceNow",
+        "purpose": [
+          "IT/helpdesk workflows"
+        ]
+      },
+      {
+        "name": "Learning Management System",
+        "purpose": [
+          "learning access"
+        ],
+        "vendor": "unspecified"
+      }
+    ],
+    "recommended_or_inferred": [
+      {
+        "name": "Microsoft Entra ID",
+        "purpose": [
+          "enterprise authentication",
+          "SSO",
+          "role/group claims"
+        ],
+        "note": "Recommended implementation detail inferred from the Microsoft ecosystem and no-separate-login requirement."
+      }
+    ]
+  },
+  "data_model": {
+    "Employee": {
+      "fields": [
+        "id",
+        "firstName",
+        "lastName",
+        "displayName",
+        "department",
+        "location",
+        "role",
+        "managerId",
+        "photoUrl",
+        "persona",
+        "permissions"
+      ]
+    },
+    "Announcement": {
+      "fields": [
+        "id",
+        "title",
+        "summary",
+        "body",
+        "category",
+        "audience",
+        "author",
+        "publishedAt",
+        "heroImage",
+        "isFeatured",
+        "source"
+      ]
+    },
+    "Event": {
+      "fields": [
+        "id",
+        "title",
+        "startAt",
+        "endAt",
+        "location",
+        "virtualLink",
+        "audience",
+        "type"
+      ]
+    },
+    "Approval": {
+      "fields": [
+        "id",
+        "type",
+        "requester",
+        "approver",
+        "status",
+        "submittedAt",
+        "dueAt",
+        "summary",
+        "details",
+        "attachments"
+      ]
+    },
+    "ServiceRequest": {
+      "fields": [
+        "id",
+        "service",
+        "category",
+        "employeeId",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "externalSystemId",
+        "timeline"
+      ]
+    },
+    "Application": {
+      "fields": [
+        "id",
+        "name",
+        "description",
+        "logoAssetId",
+        "url",
+        "audience",
+        "favorite",
+        "recentlyUsedAt"
+      ]
+    },
+    "KnowledgeDocument": {
+      "fields": [
+        "id",
+        "title",
+        "type",
+        "department",
+        "owner",
+        "version",
+        "effectiveDate",
+        "lastReviewedAt",
+        "nextReviewAt",
+        "source",
+        "permissions",
+        "tags"
+      ]
+    },
+    "LearningItem": {
+      "fields": [
+        "id",
+        "title",
+        "provider",
+        "duration",
+        "dueAt",
+        "progressPercent",
+        "status",
+        "recommendedReason"
+      ]
+    },
+    "Recognition": {
+      "fields": [
+        "id",
+        "senderEmployeeId",
+        "recipientEmployeeId",
+        "category",
+        "message",
+        "createdAt",
+        "visibility",
+        "points"
+      ]
+    },
+    "Community": {
+      "fields": [
+        "id",
+        "name",
+        "description",
+        "memberCount",
+        "image",
+        "joined",
+        "owner"
+      ]
+    },
+    "CommunityPost": {
+      "fields": [
+        "id",
+        "communityId",
+        "author",
+        "body",
+        "createdAt",
+        "reactionCount",
+        "commentCount",
+        "isPinned"
+      ]
+    },
+    "AnalyticsAsset": {
+      "fields": [
+        "id",
+        "name",
+        "category",
+        "powerBiUrl",
+        "audience",
+        "favorite",
+        "lastViewedAt"
+      ]
+    },
+    "Notification": {
+      "fields": [
+        "id",
+        "employeeId",
+        "type",
+        "title",
+        "body",
+        "createdAt",
+        "readAt",
+        "targetRoute"
+      ]
+    },
+    "AuditEvent": {
+      "fields": [
+        "id",
+        "actorId",
+        "action",
+        "entityType",
+        "entityId",
+        "timestamp",
+        "metadata"
+      ]
+    }
+  },
+  "demo_data": {
+    "employee": {
+      "id": "EMP-001",
+      "firstName": "Avinash",
+      "displayName": "Avinash",
+      "department": "Sales",
+      "location": "Bengaluru",
+      "persona": "field_sales_employee"
+    },
+    "home": {
+      "pendingApprovals": 5,
+      "leaveBalanceDays": 12,
+      "trainingCompletionPercent": 72,
+      "openServiceRequests": 2
+    },
+    "news": [
+      {
+        "title": "Leadership Update",
+        "category": "Leadership",
+        "summary": "Latest update from HCCB leadership.",
+        "placeholder": true
+      },
+      {
+        "title": "Company Townhall",
+        "category": "Townhall",
+        "summary": "Watch the latest company townhall recording.",
+        "placeholder": true
+      }
+    ],
+    "events": [
+      {
+        "title": "Monthly Townhall",
+        "dateLabel": "Upcoming",
+        "placeholder": true
+      },
+      {
+        "title": "Learning Session",
+        "dateLabel": "Upcoming",
+        "placeholder": true
+      }
+    ],
+    "note": "Demo content values that are not in the source are clearly placeholders and must be replaced by real enterprise data."
+  },
+  "ai_experience": {
+    "entry_points": [
+      "top header Ask AI button",
+      "home assistant card",
+      "global search AI overview",
+      "document AI summary"
+    ],
+    "conversation_layout": {
+      "desktop": "two-column assistant workspace with conversation and source/action rail",
+      "mobile": "full-screen chat with collapsible sources"
+    },
+    "suggested_actions": [
+      "Summarize this policy",
+      "Show related SOPs",
+      "Open source",
+      "Start a service request",
+      "Find training",
+      "Show my pending approvals"
+    ],
+    "personalized_recommendations": [
+      "training courses",
+      "communities",
+      "documents",
+      "internal opportunities"
+    ],
+    "trust_ui": [
+      "source citations on enterprise answers",
+      "permission-aware retrieval message",
+      "last updated date",
+      "content owner label",
+      "AI-generated indicator"
+    ]
+  },
+  "responsive_behavior": {
+    "breakpoints": {
+      "mobile": "0-767px",
+      "tablet": "768-1199px",
+      "desktop": "1200px+"
+    },
+    "mobile_first_rules": [
+      "Primary actions must be reachable with one thumb.",
+      "Minimum interactive target 44x44px.",
+      "Collapse dashboard grids to a single prioritized stream.",
+      "Use bottom navigation for top employee actions.",
+      "Keep search and notifications one tap away.",
+      "Avoid horizontal tables; convert them to cards or stacked rows.",
+      "Use sticky action bars on transactional forms.",
+      "Support low-attention, on-the-go frontline use."
+    ],
+    "desktop_rules": [
+      "Use 12-column grid.",
+      "Persistent side navigation.",
+      "2-4 card columns depending on content density.",
+      "Allow split views for approvals, search and AI assistant."
+    ]
+  },
+  "motion_and_animation": {
+    "principles": [
+      "Motion should clarify hierarchy and state, never feel playful or distracting.",
+      "Prefer opacity and transform animations for performance.",
+      "All motion must respect prefers-reduced-motion."
+    ],
+    "tokens": {
+      "instant_ms": 90,
+      "fast_ms": 140,
+      "standard_ms": 200,
+      "emphasis_ms": 320,
+      "countup_ms": 650,
+      "easing_standard": "cubic-bezier(0.2, 0, 0, 1)",
+      "easing_exit": "cubic-bezier(0.4, 0, 1, 1)"
+    },
+    "patterns": [
+      {
+        "name": "page_enter",
+        "trigger": "route change",
+        "effect": "fade from 0 to 1 and translateY from 8px to 0",
+        "duration_ms": 200
+      },
+      {
+        "name": "card_hover",
+        "trigger": "pointer hover",
+        "effect": "translateY -2px, subtle shadow increase",
+        "duration_ms": 140
+      },
+      {
+        "name": "quick_action_press",
+        "trigger": "tap/click",
+        "effect": "scale to 0.98 then return",
+        "duration_ms": 90
+      },
+      {
+        "name": "search_open",
+        "trigger": "focus global search",
+        "effect": "expand search layer with fade and slight scale",
+        "duration_ms": 180
+      },
+      {
+        "name": "notification_bell",
+        "trigger": "new high-priority notification",
+        "effect": "single subtle 6-degree tilt sequence; never loop",
+        "duration_ms": 320
+      },
+      {
+        "name": "success_state",
+        "trigger": "successful form submission",
+        "effect": "check icon stroke reveal + confirmation card fade-in",
+        "duration_ms": 320
+      },
+      {
+        "name": "dashboard_kpi",
+        "trigger": "first viewport entry",
+        "effect": "count from previous/zero to final value once",
+        "duration_ms": 650
+      },
+      {
+        "name": "ai_thinking",
+        "trigger": "assistant generating response",
+        "effect": "three-dot pulse or soft shimmer within assistant bubble",
+        "duration_ms": 1200,
+        "loop": true
+      },
+      {
+        "name": "skeleton_loading",
+        "trigger": "remote content loading",
+        "effect": "subtle neutral shimmer",
+        "duration_ms": 1400,
+        "loop": true
+      }
+    ],
+    "reduced_motion": {
+      "replace_transforms_with": "opacity-only transitions",
+      "disable": [
+        "count-up",
+        "bell tilt",
+        "scale press",
+        "parallax"
+      ]
+    }
+  },
+  "component_library": {
+    "foundations": [
+      "AppShell",
+      "GlobalHeader",
+      "SideNavigation",
+      "MobileBottomNavigation",
+      "PageHeader",
+      "SectionHeader",
+      "Card",
+      "MetricCard",
+      "StatusChip",
+      "Avatar",
+      "Button",
+      "IconButton",
+      "Tabs",
+      "SearchInput",
+      "FilterChip",
+      "EmptyState",
+      "Skeleton",
+      "Toast",
+      "Modal",
+      "Drawer"
+    ],
+    "domain_components": [
+      "GreetingHero",
+      "QuickActionGrid",
+      "ApplicationTile",
+      "ApprovalCard",
+      "NewsCard",
+      "EventCard",
+      "LearningProgressCard",
+      "RecognitionCard",
+      "KnowledgeResultCard",
+      "PolicyMetadataPanel",
+      "PowerBIDashboardTile",
+      "ServiceRequestTracker",
+      "CommunityCard",
+      "AIAskCard",
+      "AISourceCard",
+      "ContentHealthCard"
+    ],
+    "states_required_for_every_component": [
+      "default",
+      "hover where applicable",
+      "focus",
+      "active",
+      "disabled",
+      "loading",
+      "empty where applicable",
+      "error where applicable"
+    ]
+  },
+  "permissions_and_roles": {
+    "roles": [
+      "employee",
+      "frontline_employee",
+      "field_sales_employee",
+      "manager",
+      "hr_content_owner",
+      "it_content_owner",
+      "sales_content_owner",
+      "operations_content_owner",
+      "communications_content_owner",
+      "platform_admin"
+    ],
+    "rules": [
+      "Navigation and application tiles are audience-aware.",
+      "Search results inherit source-system permissions.",
+      "AI assistant cannot bypass source permissions.",
+      "Only designated content owners can publish or archive owned content.",
+      "Only managers/authorized approvers see approval actions.",
+      "Admin governance screens are hidden from standard employees."
+    ]
+  },
+  "governance": {
+    "review_frequency": "every 3 months",
+    "lifecycle": [
+      "draft",
+      "review",
+      "approved",
+      "published",
+      "review_due",
+      "archived"
+    ],
+    "features": [
+      "content ownership",
+      "review reminders",
+      "archive outdated content",
+      "approval workflows",
+      "audit reporting"
+    ]
+  },
+  "accessibility": {
+    "source_status": "recommended_or_inferred",
+    "target": "WCAG 2.2 AA",
+    "requirements": [
+      "Keyboard accessible navigation and dialogs.",
+      "Visible focus states.",
+      "Color contrast at or above AA thresholds.",
+      "Do not encode status using color alone.",
+      "44x44px minimum mobile targets.",
+      "Semantic headings and landmarks.",
+      "Form labels and inline validation.",
+      "Screen-reader labels for icons.",
+      "Captions/transcripts for townhall videos where available.",
+      "Reduced-motion support."
+    ]
+  },
+  "non_functional_ux": {
+    "performance": [
+      "Prioritize first meaningful employee content above the fold.",
+      "Lazy-load analytics embeds and media.",
+      "Use skeleton states rather than blocking spinners.",
+      "Cache application catalog and navigation metadata.",
+      "Optimize for mobile network variability."
+    ],
+    "reliability": [
+      "Show last-updated timestamps for remote data.",
+      "Gracefully degrade individual widgets if one integration fails.",
+      "Keep global navigation and local cached content usable during partial failures."
+    ],
+    "security_ui": [
+      "SSO-first entry.",
+      "No credential collection inside the portal for connected systems.",
+      "Use permission-aware deep links.",
+      "Hide restricted content rather than showing inaccessible previews."
+    ]
+  },
+  "business_outcomes": {
+    "source_derived": [
+      "50-70% faster information discovery",
+      "higher engagement",
+      "improved productivity",
+      "greater self-service adoption",
+      "better communication reach",
+      "better governance",
+      "reduced dependency on emails",
+      "mobile accessibility",
+      "reduced operational costs",
+      "higher platform adoption",
+      "single secure platform",
+      "lower maintenance effort"
+    ],
+    "dashboard_measurement_recommendations": [
+      "search success rate",
+      "zero-result search rate",
+      "median time to find information",
+      "self-service completion rate",
+      "service deflection rate",
+      "monthly active users",
+      "frontline mobile active users",
+      "news reach",
+      "learning completion rate",
+      "recognition participation rate",
+      "content freshness compliance"
+    ]
+  },
+  "roadmap": [
+    {
+      "phase": 1,
+      "name": "Foundation",
+      "scope": [
+        "design system",
+        "app shell",
+        "identity and role model",
+        "home",
+        "news",
+        "knowledge",
+        "search",
+        "application launcher",
+        "mobile shell"
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Services",
+      "scope": [
+        "HR self-service",
+        "IT support",
+        "approvals",
+        "workspace",
+        "learning",
+        "recognition",
+        "communities"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Integrations",
+      "scope": [
+        "SAP",
+        "CRM",
+        "ERP",
+        "DMS",
+        "ServiceNow",
+        "LMS",
+        "Power BI",
+        "SharePoint",
+        "Teams/Viva"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "AI Transformation",
+      "scope": [
+        "AI knowledge assistant",
+        "AI summaries",
+        "personalized recommendations",
+        "AI-assisted self-service",
+        "AI overview in search"
+      ]
+    }
+  ],
+  "stitch_generation_plan": {
+    "generate_as_one_coherent_product": true,
+    "screen_batches": [
+      {
+        "batch": 1,
+        "screens": [
+          "splash_and_sign_in",
+          "home",
+          "my_workspace",
+          "approvals",
+          "application_catalog"
+        ]
+      },
+      {
+        "batch": 2,
+        "screens": [
+          "company_news",
+          "leadership_corner",
+          "hr_services",
+          "it_support",
+          "knowledge_hub",
+          "document_detail"
+        ]
+      },
+      {
+        "batch": 3,
+        "screens": [
+          "learning_hub",
+          "sales_hub",
+          "manufacturing_hub",
+          "supply_chain_hub",
+          "communities",
+          "recognition"
+        ]
+      },
+      {
+        "batch": 4,
+        "screens": [
+          "analytics",
+          "ai_assistant",
+          "search_results",
+          "profile",
+          "admin_governance"
+        ]
+      }
+    ],
+    "prototype_connections": [
+      "login -> home",
+      "home pending approvals -> approvals",
+      "home quick action Request Leave -> HR Services leave flow",
+      "home quick action Raise IT Ticket -> IT Support ticket flow",
+      "home search -> Search Results",
+      "search result -> Document Detail",
+      "document detail AI summary -> AI Assistant",
+      "home AI prompt -> AI Assistant",
+      "home app tile -> Application Catalog or external app",
+      "home news -> Company News",
+      "home learning -> Learning Hub",
+      "home recognition -> Recognition Center",
+      "Services -> HR Services / IT Support",
+      "Knowledge -> Knowledge Hub",
+      "Analytics -> Analytics Dashboard",
+      "Profile -> My Profile",
+      "content owner profile -> Content Governance"
+    ],
+    "quality_bar": [
+      "Every destination must be clickable in prototype mode.",
+      "No dead-end cards on primary flows.",
+      "Generate desktop and mobile variants for all tier-1 screens.",
+      "Keep component styling consistent across all batches.",
+      "Include loading, empty, error and permission-denied states.",
+      "Use realistic enterprise content placeholders, clearly marked as mock where source data is absent."
+    ]
+  }
+}
