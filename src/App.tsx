@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { GuideStage, PathStrip } from "./guide";
 import { StatusBar, TabBar } from "./ui";
 import { useHub } from "./store";
 import { Login } from "./screens/Login";
@@ -41,6 +42,7 @@ function Shell() {
   return (
     <div className="app">
       <StatusBar />
+      <PathStrip />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/workspace" element={<Workspace />} />
@@ -98,7 +100,7 @@ export default function App() {
   const nav = useNavigate();
   const { state, ready } = useHub();
   return (
-    <div className="stage">
+    <GuideStage>
       <div className="device">
         <div className="device-screen">
           <div className="device-notch" />
@@ -113,6 +115,6 @@ export default function App() {
           </Routes>
         </div>
       </div>
-    </div>
+    </GuideStage>
   );
 }

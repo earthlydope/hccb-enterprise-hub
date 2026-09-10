@@ -70,7 +70,9 @@ export function TabBar() {
         const active =
           t.to === "/"
             ? loc.pathname === "/"
-            : loc.pathname === t.to || loc.pathname.startsWith(t.to + "/");
+            : t.to === "/workspace"
+              ? loc.pathname.startsWith("/workspace") || loc.pathname.startsWith("/approvals")
+              : loc.pathname === t.to || loc.pathname.startsWith(t.to + "/");
         return (
           <NavLink key={t.to} to={t.to} className={active ? "tab active" : "tab"}>
             <Icon name={t.icon} fill={active} />
@@ -90,6 +92,7 @@ export function ScreenHeader({ title, back }: { title: string; back?: boolean })
       {back !== false && (
         <button className="back" onClick={() => nav(-1)}>
           <Icon name="chevron_left" />
+          Back
         </button>
       )}
       <h2 className="h2" style={{ flex: 1 }}>

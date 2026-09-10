@@ -30,9 +30,160 @@ a { color: inherit; text-decoration: none; }
 .stage {
   min-height: 100svh;
   display: grid;
-  place-items: center;
-  padding: 28px 16px;
+  grid-template-columns: minmax(200px, 280px) minmax(320px, 390px) minmax(200px, 280px);
+  justify-content: center;
+  align-items: center;
+  gap: 20px 28px;
+  padding: 24px 20px;
   background: #e8e8ed;
+}
+
+.rail {
+  position: relative;
+  align-self: center;
+  max-height: min(844px, calc(100svh - 36px));
+  overflow: auto;
+  padding: 8px 4px;
+}
+.rail::-webkit-scrollbar { display: none; }
+.rail-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.rail-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+  line-height: 1.15;
+}
+.rail-body {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #3a3a3c;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+.rail-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #3a3a3c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.rail-list li { margin-bottom: 6px; }
+.rail-trail { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 12px; }
+.rail-step { display: inline-flex; align-items: center; gap: 4px; }
+.rail-arrow { color: var(--muted); font-size: 13px; }
+.rail-chip {
+  border: 0;
+  background: #fff;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.rail-chip.on { background: var(--ink); color: #fff; }
+.rail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #007aff;
+  margin-bottom: 4px;
+}
+.rail-next { display: flex; flex-direction: column; gap: 8px; }
+.rail-go {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.016em;
+  color: var(--ink);
+}
+.rail-go .ms { color: #007aff; }
+.rail-muted { font-size: 13px; color: var(--muted); }
+.rail-pointer {
+  position: absolute;
+  top: 46%;
+  right: -18px;
+  font-size: 28px;
+  color: rgba(0, 0, 0, 0.2);
+  font-weight: 300;
+  pointer-events: none;
+}
+.rail-pointer.left { right: auto; left: -18px; }
+
+.path-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px 6px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 12px;
+}
+.path-back {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: rgba(120, 120, 128, 0.12);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #007aff;
+  flex-shrink: 0;
+  padding: 0;
+}
+.path-back.ghost { background: transparent; }
+.path-now {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.path-now b {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+}
+.path-now span {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.path-nudge {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: rgba(0, 122, 255, 0.12);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #007aff;
+  flex-shrink: 0;
+  padding: 0;
 }
 
 .device {
@@ -410,6 +561,7 @@ a { color: inherit; text-decoration: none; }
   text-align: left;
   width: 100%;
 }
+.list-item .ms:last-child { color: #c7c7cc; margin-left: auto; }
 .list > .list-item:last-child,
 .scroll > .list-item:last-of-type { border-bottom: 0; }
 .scroll > .list-item {
@@ -560,9 +712,15 @@ a { color: inherit; text-decoration: none; }
 }
 .ms.fill { font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24; }
 
+@media (max-width: 860px) {
+  .stage { grid-template-columns: 1fr; justify-items: center; }
+  .rail { display: none; }
+}
+
 @media (max-width: 480px) {
-  .stage { padding: 0; background: #000; }
+  .stage { padding: 0; background: #000; grid-template-columns: 1fr; }
   .device { width: 100%; height: 100svh; border-radius: 0; padding: 0; box-shadow: none; background: #000; }
   .device-screen { border-radius: 0; }
   .device-notch { display: none; }
+  .rail { display: none; }
 }
