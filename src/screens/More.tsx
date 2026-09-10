@@ -2,33 +2,92 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icon, ScreenHeader, TopBar } from "../ui";
 import { analyticsCards, apps, communities, governanceItems, learningCourses, newsItems, recognitionFeed } from "../data";
-import { toast, useHub, user } from "../store";
+import { toast, useHub } from "../store";
+import { personas } from "../personas";
 
 export function Profile() {
-  const { dispatch } = useHub();
+  const { dispatch, user, state } = useHub();
   const nav = useNavigate();
-  const [lang, setLang] = useState("English");
+  const isAdmin = user.roles.includes("admin");
   return (
     <>
-      <ScreenHeader title="Profile" />
+      <ScreenHeader title="Employee Card" />
       <div className="scroll">
         <div className="card" style={{ textAlign: "center" }}>
-          <img className="avatar" src={user.avatar} alt="" style={{ width: 72, height: 72 }} />
+          <img className="avatar" src={user.avatar} alt="" style={{ width: 84, height: 84, border: "2px solid #f40009" }} />
           <h2 className="h2">{user.fullName}</h2>
           <p className="tiny">
-            {user.id} · {user.role}
+            Emp ID: {user.empId} · {user.lane}
           </p>
           <p className="muted">
-            {user.department} · {user.location}
+            {user.roleTitle}
           </p>
+          <p className="tiny">{user.department} · {user.location}</p>
           <p className="tiny">Manager: {user.manager}</p>
-          <button className="cta small" style={{ margin: "12px auto 0" }} onClick={() => nav("/admin")}>
-            Admin Console
-          </button>
+          <p className="tiny">{user.email}</p>
+          {isAdmin && (
+            <button className="cta small" style={{ margin: "12px auto 0" }} onClick={() => nav("/admin")}>
+              Admin Console
+            </button>
+          )}
         </div>
+        <div className="section-title">
+          <h3>Switch demo user</h3>
+        </div>
+        {personas.map((p) => (
+          <button
+            key={p.id}
+            className={p.id === user.id ? "list-item current-user" : "list-item"}
+            onClick={() => {
+              dispatch({ type: "LOGIN", userId: p.id });
+              toast(dispatch, `Now viewing as ${p.fullName}`);
+              nav("/");
+            }}
+          >
+            <img className="avatar" src={p.avatar} alt="" />
+            <div>
+              <h4>{p.fullName}</h4>
+              <div className="tiny">{p.lane} · {p.roleTitle}</div>
+            </div>
+          </button>
+        ))}
+        <div className="section-title">
+          <h3>More</h3>
+        </div>
+        <button className="list-item" onClick={() => nav("/communities")}>
+          <Icon name="groups" />
+          <div>
+            <h4>Communities</h4>
+            <div className="tiny">Plant, support desk, run club</div>
+          </div>
+        </button>
+        <button className="list-item" onClick={() => nav("/recognition")}>
+          <Icon name="emoji_events" />
+          <div>
+            <h4>Recognition</h4>
+            <div className="tiny">Peer shout-outs</div>
+          </div>
+        </button>
+        <button className="list-item" onClick={() => nav("/learning")}>
+          <Icon name="school" />
+          <div>
+            <h4>Learning</h4>
+            <div className="tiny">{user.training}% complete</div>
+          </div>
+        </button>
+        <button className="list-item" onClick={() => nav("/analytics")}>
+          <Icon name="monitoring" />
+          <div>
+            <h4>Analytics</h4>
+            <div className="tiny">Volume, OEE, tickets</div>
+          </div>
+        </button>
         <div className="field" style={{ marginTop: 14 }}>
           <label>Language</label>
-          <select value={lang} onChange={(e) => setLang(e.target.value)}>
+          <select
+            value={state.language}
+            onChange={(e) => dispatch({ type: "LANG", language: e.target.value as typeof state.language })}
+          >
             <option>English</option>
             <option>हिन्दी</option>
             <option>ಕನ್ನಡ</option>
@@ -39,13 +98,6 @@ export function Profile() {
           <div>
             <h4>Notification preferences</h4>
             <div className="tiny">Approvals, learning, communities</div>
-          </div>
-        </button>
-        <button className="list-item" onClick={() => toast(dispatch, "High contrast stays off in this demo", "info")}>
-          <Icon name="accessibility" />
-          <div>
-            <h4>Accessibility</h4>
-            <div className="tiny">Larger tap targets enabled for field mode</div>
           </div>
         </button>
         <button
@@ -63,17 +115,17 @@ export function Profile() {
 }
 
 export function Notifications() {
-  const { state, dispatch } = useHub();
+  const { slice, dispatch } = useHub();
   const nav = useNavigate();
   const [cat, setCat] = useState("All");
   const cats = ["All", "Approvals", "Company", "Learning", "Recognition", "Service Requests"];
-  const items = state.notifications.filter((n) => cat === "All" || n.category === cat);
+  const items = slice.notifications.filter((n) => cat === "All" || n.category === cat);
   return (
     <>
       <ScreenHeader title="Notifications" />
       <div className="scroll">
         <div className="between">
-          <span className="tiny">{state.notifications.filter((n) => !n.read).length} unread</span>
+          <span className="tiny">{slice.notifications.filter((n) => !n.read).length} unread</span>
           <button className="link" onClick={() => dispatch({ type: "READ_ALL" })}>
             Mark all read
           </button>
@@ -112,7 +164,7 @@ export function Notifications() {
 
 export function Apps() {
   const nav = useNavigate();
-  const { state, dispatch } = useHub();
+  const { slice, dispatch } = useHub();
   const [q, setQ] = useState("");
   const list = apps.filter((a) => a.name.toLowerCase().includes(q.toLowerCase()));
   return (
@@ -139,7 +191,7 @@ export function Apps() {
                   dispatch({ type: "TOGGLE_FAV", id: a.id });
                 }}
               >
-                <Icon name="star" fill={state.favApps.includes(a.id)} />
+                <Icon name="star" fill={slice.favApps.includes(a.id)} />
               </span>
             </button>
           ))}
@@ -153,6 +205,7 @@ export function AppLaunch() {
   const { id } = useParams();
   const app = apps.find((a) => a.id === id);
   const nav = useNavigate();
+  const { dispatch } = useHub();
   if (!app) return null;
   return (
     <>
@@ -164,10 +217,31 @@ export function AppLaunch() {
           </div>
           <h2 className="h2">{app.name}</h2>
           <p className="muted">{app.subtitle}</p>
-          <p>SSO launch is simulated in this prototype. Session stays inside HCCB Hub.</p>
+          <p>SSO session is simulated. You stay inside HCCB Hub with a read-only snapshot.</p>
         </div>
-        <button className="cta" onClick={() => nav("/")}>
-          Open {app.name}
+        <div className="card" style={{ marginTop: 10 }}>
+          <div className="tiny">LIVE SNAPSHOT</div>
+          <h4 style={{ margin: "6px 0" }}>{app.name} · South Zone</h4>
+          <p className="tiny">Last sync just now · Connected as your HCCB identity</p>
+          <div className="stats" style={{ marginTop: 8 }}>
+            <div className="stat">
+              <span>Status</span>
+              <b className="good">Online</b>
+            </div>
+            <div className="stat">
+              <span>Queue</span>
+              <b>3</b>
+            </div>
+          </div>
+        </div>
+        <button
+          className="cta"
+          onClick={() => toast(dispatch, `${app.name} session kept in Hub`, "info")}
+        >
+          Working in {app.name}
+        </button>
+        <button className="cta ghost" onClick={() => nav("/apps")}>
+          Back to all tools
         </button>
       </div>
     </>
@@ -207,9 +281,9 @@ export function News() {
 export function NewsDetail() {
   const { id } = useParams();
   const item = newsItems.find((n) => n.id === id);
-  const { dispatch, state } = useHub();
+  const { dispatch, slice } = useHub();
   if (!item) return null;
-  const read = state.newsRead.includes(item.id);
+  const read = slice.newsRead.includes(item.id);
   return (
     <>
       <ScreenHeader title={item.category} />
@@ -235,13 +309,13 @@ export function NewsDetail() {
 }
 
 export function Learning() {
-  const { state, dispatch } = useHub();
+  const { slice, dispatch } = useHub();
   return (
     <>
       <ScreenHeader title="Learning" />
       <div className="scroll">
         {learningCourses.map((c) => {
-          const p = state.courses[c.id] ?? c.progress;
+          const p = slice.courses[c.id] ?? c.progress;
           return (
             <div key={c.id} className="card" style={{ marginBottom: 10 }}>
               <div className="between">
@@ -301,7 +375,7 @@ export function Communities() {
 }
 
 export function Recognition() {
-  const { dispatch } = useHub();
+  const { dispatch, user } = useHub();
   const [text, setText] = useState("");
   const [feed, setFeed] = useState(recognitionFeed);
   return (
@@ -365,7 +439,20 @@ export function Analytics() {
 }
 
 export function Admin() {
-  const { state, dispatch } = useHub();
+  const { state, dispatch, user } = useHub();
+  if (!user.roles.includes("admin")) {
+    return (
+      <>
+        <ScreenHeader title="Admin Console" />
+        <div className="scroll">
+          <div className="card">
+            <h4>Restricted</h4>
+            <p className="muted">Admin Console is available to Avinash B M (Corporate · Tier 1 Admin) in this demo.</p>
+          </div>
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <ScreenHeader title="Admin Console" />
@@ -420,7 +507,7 @@ export function HubPage({ kind }: { kind: "sales" | "mfg" | "sc" }) {
       title: "Manufacturing Hub",
       items: [
         ["Plant Safety SOP", "/knowledge/sop-plant-safety"],
-        ["Plant news", "/news/n2"],
+        ["Plant news", "/news/n3"],
         ["Productivity", "/analytics"],
         ["Service requests", "/services/it"],
       ],

@@ -6,13 +6,27 @@ import { toast, useHub } from "../store";
 
 export function Knowledge() {
   const nav = useNavigate();
+  const { user } = useHub();
   const [type, setType] = useState("All");
   const types = ["All", "SOP", "Policy", "Playbook", "HR Document"];
   const list = knowledgeDocs.filter((d) => type === "All" || d.type === type);
+  const plantMode = user.roles.includes("plant");
   return (
     <>
       <TopBar title="Knowledge" />
       <div className="scroll">
+        {plantMode && (
+          <div className="card" style={{ background: "#0f172a", color: "#fff", marginBottom: 12 }}>
+            <div className="tiny" style={{ color: "#ff8a80" }}>Offline · required before shift</div>
+            <h2 className="h2" style={{ color: "#fff" }}>Manufacturing chemical handling & CIP</h2>
+            <p className="tiny" style={{ color: "#94a3b8" }}>
+              Level 3 PPE · dual lockout on Line 2 · eyewash test 06:00
+            </p>
+            <button className="cta" onClick={() => nav("/knowledge/" + (knowledgeDocs.find((d) => d.type === "SOP")?.id ?? knowledgeDocs[0].id))}>
+              1-tap sign SOP
+            </button>
+          </div>
+        )}
         <h1 className="h1">Policies & SOPs</h1>
         <div className="filters">
           {types.map((t) => (
@@ -43,7 +57,7 @@ export function Knowledge() {
 export function KnowledgeDetail() {
   const { id } = useParams();
   const nav = useNavigate();
-  const { state, dispatch } = useHub();
+  const { slice, dispatch } = useHub();
   const doc = knowledgeDocs.find((d) => d.id === id);
   const [acked, setAcked] = useState(false);
   if (!doc) {
@@ -54,7 +68,7 @@ export function KnowledgeDetail() {
       </>
     );
   }
-  const saved = state.bookmarks.includes(doc.id);
+  const saved = slice.bookmarks.includes(doc.id);
   return (
     <>
       <ScreenHeader title={doc.type} />

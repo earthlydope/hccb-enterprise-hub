@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useHub, user } from "./store";
+import { useHub } from "./store";
 
 export function Icon({ name, fill, size }: { name: string; fill?: boolean; size?: number }) {
   return (
@@ -12,8 +12,9 @@ export function Icon({ name, fill, size }: { name: string; fill?: boolean; size?
 export function StatusBar() {
   return (
     <div className="status-bar">
-      <span>9:41</span>
-      <span style={{ display: "flex", gap: 6, alignItems: "center" }}>
+      <span className="time">9:41</span>
+      <span aria-hidden="true" />
+      <span className="signals">
         <Icon name="signal_cellular_alt" size={16} />
         <Icon name="wifi" size={16} />
         <Icon name="battery_full" size={16} />
@@ -24,15 +25,12 @@ export function StatusBar() {
 
 export function TopBar({ title = "Home" }: { title?: string }) {
   const nav = useNavigate();
-  const { unread } = useHub();
+  const { unread, user } = useHub();
   return (
     <header className="topbar">
       <div className="brand">
         <img src="/coca-cola.svg" alt="Coca-Cola" />
-        <div className="meta">
-          <b>HCCB HUB</b>
-          <span>{title}</span>
-        </div>
+        <span className="nav-title">{title}</span>
       </div>
       <button className="icon-btn" aria-label="Search" onClick={() => nav("/search")}>
         <Icon name="search" />
@@ -41,23 +39,31 @@ export function TopBar({ title = "Home" }: { title?: string }) {
         <Icon name="notifications" />
         {unread > 0 && <span className="badge">{unread}</span>}
       </button>
-      <button className="icon-btn" aria-label="Profile" onClick={() => nav("/profile")} style={{ padding: 0 }}>
-        <img className="avatar" src={user.avatar} alt="" />
+      <button className="icon-btn" aria-label="Profile" onClick={() => nav("/profile")} style={{ padding: 0, background: "transparent" }}>
+        <img className="avatar" src={user.avatar} alt={user.fullName} />
       </button>
     </header>
   );
 }
 
+const tabCopy: Record<string, Record<string, string>> = {
+  English: { Home: "Home", Workspace: "Workspace", Services: "Services", "AI Copilot": "AI Copilot", Knowledge: "Knowledge" },
+  हिन्दी: { Home: "होम", Workspace: "वर्कस्पेस", Services: "सेवाएँ", "AI Copilot": "कोपायलट", Knowledge: "ज्ञान" },
+  ಕನ್ನಡ: { Home: "ಮುಖಪುಟ", Workspace: "ವರ್ಕ್‌ಸ್ಪೇಸ್", Services: "ಸೇವೆಗಳು", "AI Copilot": "ಕೋಪೈಲಟ್", Knowledge: "ಜ್ಞಾನ" },
+};
+
 const tabs = [
   { to: "/", icon: "home", label: "Home" },
-  { to: "/workspace", icon: "work", label: "Workspace" },
-  { to: "/services", icon: "apps", label: "Services" },
+  { to: "/workspace", icon: "business_center", label: "Workspace" },
+  { to: "/services", icon: "grid_view", label: "Services" },
   { to: "/copilot", icon: "auto_awesome", label: "AI Copilot", spark: true },
   { to: "/knowledge", icon: "menu_book", label: "Knowledge" },
 ];
 
 export function TabBar() {
   const loc = useLocation();
+  const { state } = useHub();
+  const dict = tabCopy[state.language] ?? tabCopy.English;
   return (
     <nav className="tabbar">
       {tabs.map((t) => {
@@ -69,7 +75,7 @@ export function TabBar() {
           <NavLink key={t.to} to={t.to} className={active ? "tab active" : "tab"}>
             <Icon name={t.icon} fill={active} />
             {t.spark && <i className="spark" />}
-            {t.label}
+            {dict[t.label] ?? t.label}
           </NavLink>
         );
       })}

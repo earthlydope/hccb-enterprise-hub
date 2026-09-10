@@ -33,8 +33,9 @@ import {
 } from "./screens/More";
 
 function Shell() {
-  const { state } = useHub();
+  const { state, ready } = useHub();
   const loc = useLocation();
+  if (!ready) return null;
   if (!state.session) return <Navigate to="/login" replace />;
   const hideTabs = ["/login"].includes(loc.pathname);
   return (
@@ -95,13 +96,19 @@ function Toasts() {
 
 export default function App() {
   const nav = useNavigate();
+  const { state, ready } = useHub();
   return (
     <div className="stage">
       <div className="device">
         <div className="device-screen">
           <div className="device-notch" />
           <Routes>
-            <Route path="/login" element={<Login onIn={() => nav("/")} />} />
+            <Route
+              path="/login"
+              element={
+                !ready ? null : state.session ? <Navigate to="/" replace /> : <Login onIn={() => nav("/")} />
+              }
+            />
             <Route path="/*" element={<Shell />} />
           </Routes>
         </div>

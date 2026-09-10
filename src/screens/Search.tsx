@@ -2,13 +2,14 @@ import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon, ScreenHeader } from "../ui";
 import { apps, knowledgeDocs, newsItems, copilotAnswer } from "../data";
+import { personas } from "../personas";
 import { useHub } from "../store";
 
 const filters = ["All", "Policies & SOPs", "News", "People", "Applications", "Learning"];
 
 export function Search() {
   const [params] = useSearchParams();
-  const { state, dispatch } = useHub();
+  const { slice, dispatch, user, pendingCount } = useHub();
   const nav = useNavigate();
   const [q, setQ] = useState(params.get("q") ?? "");
   const [facet, setFacet] = useState("All");
@@ -36,19 +37,16 @@ export function Search() {
         updated: n.time,
         to: `/news/${n.id}`,
       }));
-    const people =
-      "avinash priya manager sales".includes(query) || query.includes("avinash") || query.includes("people")
-        ? [
-            {
-              kind: "People",
-              title: "Avinash B M",
-              snippet: "Business Manager · Field Sales Operations · Bengaluru Plant",
-              source: "Directory",
-              updated: "Live",
-              to: "/profile",
-            },
-          ]
-        : [];
+    const people = personas
+      .filter((p) => `${p.fullName} ${p.roleTitle} ${p.department} ${p.lane}`.toLowerCase().includes(query) || query.includes("people"))
+      .map((p) => ({
+        kind: "People",
+        title: p.fullName,
+        snippet: `${p.roleTitle} · ${p.department} · ${p.location}`,
+        source: "Directory",
+        updated: "Live",
+        to: "/profile",
+      }));
     const applications = apps
       .filter((a) => `${a.name} ${a.subtitle}`.toLowerCase().includes(query))
       .map((a) => ({
@@ -75,7 +73,7 @@ export function Search() {
     return facet === "All" ? all : all.filter((r) => r.kind === facet);
   }, [query, facet]);
 
-  const overview = query ? copilotAnswer(query) : null;
+  const overview = query ? copilotAnswer(query, user, pendingCount) : null;
 
   return (
     <>
@@ -106,7 +104,7 @@ export function Search() {
         {!query && (
           <>
             <div className="tiny">Recent</div>
-            {state.searchHistory.map((s) => (
+            {slice.searchHistory.map((s) => (
               <button
                 key={s}
                 className="list-item"

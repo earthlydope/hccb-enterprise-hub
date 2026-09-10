@@ -1,19 +1,3 @@
-export const user = {
-  id: "E123456",
-  firstName: "Avinash",
-  lastName: "B M",
-  fullName: "Avinash B M",
-  role: "Business Manager",
-  department: "Field Sales Operations",
-  location: "Bengaluru Plant",
-  manager: "Priya Sharma",
-  email: "avinash.bm@hccb.in",
-  phone: "+91 98765 43210",
-  status: "Active" as const,
-  avatar: "/avatar.jpg",
-  isAdmin: true,
-};
-
 export type ApprovalStatus = "Pending" | "Approved" | "Rejected" | "Changes requested";
 
 export type Approval = {
@@ -30,6 +14,18 @@ export type Approval = {
 };
 
 export const initialApprovals: Approval[] = [
+  {
+    id: "APR-10430",
+    type: "Distributor Credit",
+    title: "Sri Lakshmi Enterprises credit",
+    requester: "Commercial Sales Lead",
+    requesterRole: "Plant 204",
+    amount: "₹4,50,000",
+    submitted: "Today, 7:40 AM",
+    summary: "Distributor credit request for Sri Lakshmi Enterprises.",
+    status: "Pending",
+    details: ["Requested ₹4,50,000", "Bank guarantee on file", "Plant 204"],
+  },
   {
     id: "APR-10421",
     type: "Distributor Credit",
@@ -90,6 +86,29 @@ export const initialApprovals: Approval[] = [
     status: "Pending",
     details: ["3 nights", "Client entertainment ₹4,000", "Within policy"],
   },
+  {
+    id: "APR-LEAVE-RK",
+    type: "Leave",
+    title: "Privilege leave — Ramesh Kumar",
+    requester: "Ramesh Kumar",
+    requesterRole: "Production Line #2",
+    submitted: "Today, 8:10 AM",
+    summary: "3 days PL for sibling wedding in Mysore. Shift relief with S. Prakash.",
+    status: "Pending",
+    details: ["April 4–6", "Privilege Leave", "Relief: S. Prakash"],
+  },
+  {
+    id: "APR-EXP-SV",
+    type: "Travel",
+    title: "Hubballi plant audit claim — Sunita Verma",
+    requester: "Sunita Verma",
+    requesterRole: "Regional Auditor",
+    amount: "₹8,450",
+    submitted: "Today, 9:00 AM",
+    summary: "Cab and hotel GST invoices for Hubballi plant audit.",
+    status: "Pending",
+    details: ["3 GST invoices", "Policy verified", "Route: Hubballi"],
+  },
 ];
 
 export type Ticket = {
@@ -99,6 +118,7 @@ export type Ticket = {
   priority: "Low" | "Medium" | "High";
   status: "Open" | "In progress" | "Resolved";
   updated: string;
+  note?: string;
 };
 
 export const initialTickets: Ticket[] = [
@@ -263,6 +283,14 @@ export const knowledgeDocs = [
 export const newsItems = [
   {
     id: "n1",
+    title: "HCCB Sustainability Milestone 2025: 100% Water Positivity",
+    category: "Leadership",
+    read: "4 min",
+    time: "Published today",
+    body: "South Region units are at zero-waste-to-landfill. Every plant is water-positive for 2025. Thank you to operations, EHS, and the bottling partners who closed the last gaps this quarter.",
+  },
+  {
+    id: "n2",
     title: "CEO note: Safety first this festive season",
     category: "Leadership",
     read: "3 min",
@@ -270,7 +298,7 @@ export const newsItems = [
     body: "As volumes ramp up, keep PPE discipline and no shortcuts on loading bays. Thank you for protecting each other.",
   },
   {
-    id: "n2",
+    id: "n3",
     title: "Bengaluru Plant hits 30 days zero-loss-time",
     category: "Plant",
     read: "2 min",
@@ -278,7 +306,7 @@ export const newsItems = [
     body: "Operations and EHS teams closed a 30-day streak. Recognition event at 4 PM in the canteen.",
   },
   {
-    id: "n3",
+    id: "n4",
     title: "New internal jobs: Territory Manager — East",
     category: "HR",
     read: "4 min",
@@ -350,8 +378,8 @@ export const communities = [
 ];
 
 export const recognitionFeed = [
-  { id: "r1", from: "Priya Sharma", to: "Avinash B M", text: "Outstanding Q2 beat conversion in East Bengaluru.", when: "Today" },
-  { id: "r2", from: "EHS Team", to: "Bengaluru Plant", text: "30 days LTI-free. Proud of the floor teams.", when: "Yesterday" },
+  { id: "r1", from: "Avinash B M", to: "Chittoor Line 2", text: "Clean CIP handover two nights running. Line 2 is setting the standard.", when: "Today" },
+  { id: "r2", from: "EHS Team", to: "Plant teams", text: "30 days LTI-free at Bengaluru. Proud of the floor teams.", when: "Yesterday" },
 ];
 
 export const governanceItems = [
@@ -368,8 +396,12 @@ export const analyticsCards = [
   { id: "a4", title: "Open tickets", value: "2", hint: "Your IT queue", tone: "bad" },
 ];
 
-export function copilotAnswer(query: string) {
+import type { Persona } from "./personas";
+import { isManager } from "./personas";
+
+export function copilotAnswer(query: string, user?: Persona, pending = 0) {
   const q = query.toLowerCase();
+  const days = user?.leaveDays ?? 12;
   if (q.includes("travel")) {
     return {
       answer:
@@ -383,8 +415,7 @@ export function copilotAnswer(query: string) {
   }
   if (q.includes("leave") || q.includes("transfer")) {
     return {
-      answer:
-        "You have 12 casual leave days. Apply 3 working days in advance. Managers must action within 48 hours. Internal transfers go through HR Services with manager endorsement.",
+      answer: `${user?.firstName ? user.firstName + ", you" : "You"} have ${days} leave days on file. Apply 3 working days in advance. Managers must action within 48 hours. Internal transfers go through HR Services with manager endorsement.`,
       sources: ["pol-leave"],
       actions: [
         { label: "Request leave", to: "/services/leave" },
@@ -395,7 +426,7 @@ export function copilotAnswer(query: string) {
   if (q.includes("sales") || q.includes("target") || q.includes("q4") || q.includes("q3")) {
     return {
       answer:
-        "Q3 sparkling playbook is live: hero SKUs 600ml / 1.25L / 250ml RGB. Perfect store target 92% urban. Your South MTD volume is 104% of plan.",
+        "Q3 sparkling playbook is live: hero SKUs 600ml / 1.25L / 250ml RGB. Perfect store target 92% urban. South MTD volume is 104% of plan.",
       sources: ["playbook-q3"],
       actions: [
         { label: "Open playbook", to: "/knowledge/playbook-q3" },
@@ -406,29 +437,44 @@ export function copilotAnswer(query: string) {
   if (q.includes("onboard") || q.includes("joining") || q.includes("document")) {
     return {
       answer:
-        "Field Sales onboarding pack covers DMS/CRM access, ride-along, and Day-30 Perfect Store certification.",
+        "Field Sales onboarding pack covers DMS/CRM access, ride-along, and Day-30 Perfect Store certification. Plant joining packs start with the Safety SOP.",
       sources: ["onboard-fso"],
       actions: [{ label: "Open onboarding pack", to: "/knowledge/onboard-fso" }],
     };
   }
-  if (q.includes("safety") || q.includes("sop") || q.includes("ppe")) {
+  if (q.includes("safety") || q.includes("sop") || q.includes("ppe") || q.includes("cip")) {
     return {
       answer:
-        "Bengaluru Plant Safety SOP v4.2: PPE in all production zones, LOTO before intervention, near-miss within 2 hours, assembly at Gate 2.",
+        "Plant Safety SOP v4.2: PPE in all production zones, LOTO before intervention, near-miss within 2 hours, assembly at Gate 2. Chittoor Line 2 also requires CIP dual lockout.",
       sources: ["sop-plant-safety"],
       actions: [{ label: "Open SOP", to: "/knowledge/sop-plant-safety" }],
     };
   }
   if (q.includes("approval") || q.includes("credit")) {
+    if (user && isManager(user)) {
+      return {
+        answer: `You have ${pending} pending items in Workspace — distributor credit, travel, and leave from the South Zone queue.`,
+        sources: [],
+        actions: [{ label: "Review in Workspace", to: "/workspace" }],
+      };
+    }
     return {
-      answer: "You have pending approvals in Workspace. Three distributor credit requests and two travel claims need review.",
+      answer:
+        "Credit and travel approvals sit with your reporting manager. You can track your own leave and travel under Workspace → My requests.",
       sources: [],
-      actions: [{ label: "Review in Workspace", to: "/workspace" }],
+      actions: [{ label: "Open Workspace", to: "/workspace" }],
+    };
+  }
+  if (q.includes("ticket") || q.includes("vpn") || q.includes("it ")) {
+    return {
+      answer: "IT tickets route to ServiceNow. You get an INC number immediately. Shared Services can see open plant and HQ incidents.",
+      sources: [],
+      actions: [{ label: "Raise IT ticket", to: "/services/it" }],
     };
   }
   return {
     answer:
-      "I searched HCCB knowledge, HR policies and sales playbooks. Try asking about travel policy, leave, plant safety SOP, or Q3 sales targets.",
+      "I searched HCCB knowledge, HR policies and plant SOPs. Try travel policy, leave balance, plant safety SOP, or IT tickets.",
     sources: [],
     actions: [{ label: "Search knowledge", to: "/search" }],
   };

@@ -44,7 +44,7 @@ export function Services() {
 }
 
 export function LeaveForm() {
-  const { dispatch, state } = useHub();
+  const { dispatch, slice, user } = useHub();
   const nav = useNavigate();
   const [type, setType] = useState("Casual Leave");
   const [from, setFrom] = useState("2026-09-18");
@@ -59,7 +59,7 @@ export function LeaveForm() {
       <ScreenHeader title="Request Leave" />
       <div className="scroll">
         <div className="card" style={{ marginBottom: 12 }}>
-          Leave balance <b>12 days</b> · Policy SLA 48h
+          Leave balance <b>{user.leaveDays} days</b> · Policy SLA 48h
         </div>
         <div className="field">
           <label>Leave type</label>
@@ -88,13 +88,24 @@ export function LeaveForm() {
             dispatch({
               type: "ADD_LEAVE",
               leave: {
-                id: `LV-${1000 + state.leaves.length}`,
+                id: `LV-${1000 + slice.leaves.length}`,
                 type,
                 from,
                 to,
                 days,
                 note,
                 status: "Submitted",
+              },
+              approval: {
+                id: `APR-LEAVE-${Date.now().toString().slice(-5)}`,
+                type: "Leave",
+                title: `${type} — ${user.fullName}`,
+                requester: user.fullName,
+                requesterRole: user.roleTitle,
+                submitted: "Just now",
+                summary: note || `${days} day(s) ${type}`,
+                status: "Pending",
+                details: [`${from} → ${to}`, `${days} day(s)`, user.location],
               },
             });
             toast(dispatch, "Leave request submitted");
@@ -106,7 +117,7 @@ export function LeaveForm() {
         <div className="section-title">
           <h3>History</h3>
         </div>
-        {state.leaves.map((l) => (
+        {slice.leaves.map((l) => (
           <div key={l.id} className="list-item">
             <Icon name="event" />
             <div>
@@ -125,7 +136,7 @@ export function LeaveForm() {
 }
 
 export function TicketForm() {
-  const { dispatch, state } = useHub();
+  const { dispatch, slice } = useHub();
   const nav = useNavigate();
   const [category, setCategory] = useState("Network");
   const [title, setTitle] = useState("");
@@ -170,7 +181,7 @@ export function TicketForm() {
           className="cta"
           disabled={!title.trim()}
           onClick={() => {
-            const id = `INC-${21000 + state.tickets.length}`;
+            const id = `INC-${21000 + slice.tickets.length}`;
             dispatch({
               type: "ADD_TICKET",
               ticket: {
@@ -180,6 +191,7 @@ export function TicketForm() {
                 priority,
                 status: "Open",
                 updated: "Just now",
+                note: desc.trim() || undefined,
               },
             });
             toast(dispatch, `${id} created`);
@@ -191,7 +203,7 @@ export function TicketForm() {
         <div className="section-title">
           <h3>Open requests</h3>
         </div>
-        {state.tickets.map((t) => (
+        {slice.tickets.map((t) => (
           <div key={t.id} className="list-item">
             <Icon name="confirmation_number" />
             <div>
@@ -199,7 +211,8 @@ export function TicketForm() {
                 {t.id} · {t.status}
               </h4>
               <div className="tiny">
-                {t.title} · {t.priority} · {t.updated}
+                  {t.title} · {t.priority} · {t.updated}
+                  {t.note ? ` · ${t.note}` : ""}
               </div>
             </div>
           </div>
@@ -210,7 +223,7 @@ export function TicketForm() {
 }
 
 export function TravelForm() {
-  const { dispatch, state } = useHub();
+  const { dispatch, slice, user } = useHub();
   const nav = useNavigate();
   const [dest, setDest] = useState("Hyderabad");
   const [dates, setDates] = useState("12–13 Sep 2026");
@@ -240,10 +253,22 @@ export function TravelForm() {
         <button
           className="cta"
           onClick={() => {
-            const id = `TR-${900 + state.travels.length}`;
+            const id = `TR-${900 + slice.travels.length}`;
             dispatch({
               type: "ADD_TRAVEL",
               item: { id, dest, dates, status: "Pending approval", cost: "Est. ₹18,600" },
+              approval: {
+                id: `APR-${id}`,
+                type: "Travel",
+                title: `${dest} — ${user.fullName}`,
+                requester: user.fullName,
+                requesterRole: user.roleTitle,
+                amount: "Est. ₹18,600",
+                submitted: "Just now",
+                summary: purpose,
+                status: "Pending",
+                details: [dates, purpose, user.location],
+              },
             });
             toast(dispatch, `${id} submitted for approval`);
             nav("/workspace");
@@ -251,7 +276,7 @@ export function TravelForm() {
         >
           Submit for approval
         </button>
-        {state.travels.map((t) => (
+        {slice.travels.map((t) => (
           <div key={t.id} className="list-item" style={{ marginTop: 8 }}>
             <Icon name="flight" />
             <div>
@@ -297,9 +322,9 @@ export function Jobs() {
 export function JobDetail() {
   const { id } = useParams();
   const job = jobs.find((j) => j.id === id);
-  const { state, dispatch } = useHub();
+  const { slice, dispatch } = useHub();
   if (!job) return null;
-  const applied = state.jobApps.includes(job.id);
+  const applied = slice.jobApps.includes(job.id);
   return (
     <>
       <ScreenHeader title="Role" />
@@ -328,7 +353,7 @@ export function JobDetail() {
 }
 
 export function Letters() {
-  const { dispatch, state } = useHub();
+  const { dispatch, slice } = useHub();
   const kinds = ["Employment letter", "Address proof", "Salary certificate"];
   return (
     <>
@@ -346,7 +371,7 @@ export function Letters() {
             <Icon name="mail" />
             <div>
               <h4>{k}</h4>
-              <div className="tiny">{state.letters.includes(k) ? "Requested" : "Tap to request"}</div>
+              <div className="tiny">{slice.letters.includes(k) ? "Requested" : "Tap to request"}</div>
             </div>
           </button>
         ))}
@@ -356,6 +381,7 @@ export function Letters() {
 }
 
 export function Attendance() {
+  const { user } = useHub();
   return (
     <>
       <ScreenHeader title="Attendance" />
@@ -363,7 +389,7 @@ export function Attendance() {
         <div className="card">
           <h2 className="h2">Sep 2026</h2>
           <p>Present 8 · WFH 0 · Leave 0 · Holidays 2</p>
-          <p className="tiny">Swipe source: Bengaluru Plant · last punch today 09:04</p>
+          <p className="tiny">Swipe source: {user.location} · last punch today 09:04</p>
         </div>
       </div>
     </>

@@ -3,60 +3,129 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Icon, ScreenHeader, TopBar } from "../ui";
 import { toast, useHub } from "../store";
 import type { ApprovalStatus } from "../data";
+import { isManager, isSupport } from "../personas";
+
+const filters = ["Pending", "Approved", "Rejected", "Changes requested", "All"] as const;
 
 export function Workspace() {
-  const { state, pendingCount } = useHub();
+  const { state, slice, pendingCount, user } = useHub();
   const nav = useNavigate();
-  const [tab, setTab] = useState<"Pending" | "Approved" | "Rejected" | "All">("Pending");
+  const [tab, setTab] = useState<(typeof filters)[number]>("Pending");
+  const manager = isManager(user);
+  const support = isSupport(user);
   const items = state.approvals.filter((a) => (tab === "All" ? true : a.status === tab));
+  const openTickets = slice.tickets.filter((t) => t.status !== "Resolved");
 
   return (
     <>
       <TopBar title="Workspace" />
       <div className="scroll">
-        <div className="kicker">MY WORKSPACE</div>
-        <h1 className="h1">Approvals & self-service</h1>
+        <div className="kicker">{manager ? "Corporate" : support ? "Support" : "My work"}</div>
+        <h1 className="h1" style={{ fontSize: 22 }}>
+          {manager ? "Approvals & documents" : support ? "Employee tickets & requests" : "My requests & documents"}
+        </h1>
+        <p className="muted">{user.homeFocus}</p>
         <div className="stats" style={{ background: "#fff", borderRadius: 16, padding: 8, marginBottom: 12 }}>
-          <button className="stat" onClick={() => setTab("Pending")}>
-            <span>Pending</span>
-            <b className="bad">{pendingCount}</b>
+          <button className="stat" onClick={() => (manager ? setTab("Pending") : nav("/services/it"))}>
+            <span>{manager ? "Pending" : support ? "Tickets" : "My leave"}</span>
+            <b className="bad">{manager ? pendingCount : support ? openTickets.length : user.leaveDays}</b>
           </button>
           <button className="stat" onClick={() => nav("/services/leave")}>
             <span>Leave</span>
-            <b>12d</b>
+            <b>{user.leaveDays}d</b>
           </button>
           <button className="stat" onClick={() => nav("/workspace/payslips")}>
             <span>Payslips</span>
-            <b>6</b>
+            <b>{user.nets}</b>
           </button>
         </div>
-        <div className="filters">
-          {(["Pending", "Approved", "Rejected", "All"] as const).map((f) => (
-            <button key={f} className={tab === f ? "filter on" : "filter"} onClick={() => setTab(f)}>
-              {f}
-            </button>
-          ))}
-        </div>
-        <div className="list">
-          {items.length === 0 && <div className="card muted">Nothing in {tab.toLowerCase()}.</div>}
-          {items.map((a) => (
-            <button key={a.id} className="list-item" onClick={() => nav(`/approvals/${a.id}`)}>
-              <div className="sys-mark" style={{ background: "#fde7ea", color: "#c5221f" }}>
-                {a.type.slice(0, 3).toUpperCase()}
-              </div>
-              <div style={{ flex: 1, textAlign: "left" }}>
-                <h4>{a.title}</h4>
-                <div className="tiny">
-                  {a.requester} · {a.submitted} · {a.amount}
+        {manager ? (
+          <>
+            <div className="filters">
+              {filters.map((f) => (
+                <button key={f} className={tab === f ? "filter on" : "filter"} onClick={() => setTab(f)}>
+                  {f}
+                </button>
+              ))}
+            </div>
+            <div className="list">
+              {items.length === 0 && <div className="card muted">Nothing in {tab.toLowerCase()}.</div>}
+              {items.map((a) => (
+                <button key={a.id} className="list-item" onClick={() => nav(`/approvals/${a.id}`)}>
+                  <div className="sys-mark" style={{ background: "#fef2f2", color: "#f40009" }}>
+                    {a.type.slice(0, 3).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1, textAlign: "left" }}>
+                    <h4>{a.title}</h4>
+                    <div className="tiny">
+                      {a.requester} · {a.submitted} · {a.amount}
+                    </div>
+                    <div className="tiny" style={{ marginTop: 4 }}>
+                      {a.status}
+                    </div>
+                  </div>
+                  <Icon name="chevron_right" />
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="section-title">
+              <h3>{support ? "Assigned tickets" : "My tickets"}</h3>
+            </div>
+            {slice.tickets.length === 0 && <div className="card muted">No tickets.</div>}
+            {slice.tickets.map((t) => (
+              <div key={t.id} className="list-item">
+                <Icon name="confirmation_number" />
+                <div>
+                  <h4>
+                    {t.id} · {t.status}
+                  </h4>
+                  <div className="tiny">
+                    {t.title} · {t.priority}
+                  </div>
                 </div>
-                <div className="tiny" style={{ marginTop: 4 }}>
-                  {a.status}
+              </div>
+            ))}
+            <div className="section-title">
+              <h3>Leave submitted</h3>
+            </div>
+            {slice.leaves.map((l) => (
+              <div key={l.id} className="list-item">
+                <Icon name="event" />
+                <div>
+                  <h4>
+                    {l.type} · {l.status}
+                  </h4>
+                  <div className="tiny">
+                    {l.from} → {l.to} ({l.days}d)
+                  </div>
                 </div>
               </div>
-              <Icon name="chevron_right" />
-            </button>
-          ))}
-        </div>
+            ))}
+            {slice.travels.length > 0 && (
+              <>
+                <div className="section-title">
+                  <h3>Travel</h3>
+                </div>
+                {slice.travels.map((t) => (
+                  <div key={t.id} className="list-item">
+                    <Icon name="flight" />
+                    <div>
+                      <h4>
+                        {t.dest} · {t.status}
+                      </h4>
+                      <div className="tiny">
+                        {t.dates} · {t.cost}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        )}
         <div className="section-title">
           <h3>My documents</h3>
         </div>
@@ -64,14 +133,14 @@ export function Workspace() {
           <Icon name="payments" />
           <div>
             <h4>Payslips</h4>
-            <div className="tiny">Last generated Aug 2026</div>
+            <div className="tiny">Last credited · Net {user.nets}</div>
           </div>
         </button>
         <button className="list-item" onClick={() => nav("/learning")}>
           <Icon name="school" />
           <div>
             <h4>Training status</h4>
-            <div className="tiny">2 required courses in progress</div>
+            <div className="tiny">{user.training}% complete</div>
           </div>
         </button>
       </div>
@@ -140,13 +209,13 @@ export function ApprovalDetail() {
 }
 
 export function Payslips() {
-  const { dispatch } = useHub();
+  const { dispatch, user } = useHub();
   const months = ["Aug 2026", "Jul 2026", "Jun 2026", "May 2026", "Apr 2026", "Mar 2026"];
   return (
     <>
       <ScreenHeader title="Payslips" />
       <div className="scroll">
-        <p className="muted">Authorized employee copies. Demo files stay in the browser.</p>
+        <p className="muted">Authorized employee copies for {user.fullName}. Demo files stay in the browser.</p>
         <div className="list">
           {months.map((m) => (
             <button
@@ -154,7 +223,7 @@ export function Payslips() {
               className="list-item"
               onClick={() => {
                 const blob = new Blob(
-                  [`HCCB Payslip — ${m}\nEmployee: Avinash B M\nNet pay: ₹1,84,220\nThis is a demo document.`],
+                  [`HCCB Payslip — ${m}\nEmployee: ${user.fullName}\nEmp ID: ${user.empId}\nNet pay: ${user.nets}\nThis is a demo document.`],
                   { type: "text/plain" }
                 );
                 const url = URL.createObjectURL(blob);
@@ -169,7 +238,7 @@ export function Payslips() {
               <Icon name="picture_as_pdf" />
               <div>
                 <h4>{m}</h4>
-                <div className="tiny">Net pay ₹1,84,220</div>
+                <div className="tiny">Net pay {user.nets}</div>
               </div>
             </button>
           ))}
