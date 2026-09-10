@@ -26,7 +26,7 @@ export function Profile() {
           <p className="tiny">Manager: {user.manager}</p>
           <p className="tiny">{user.email}</p>
           {isAdmin && (
-            <button className="cta small" style={{ margin: "12px auto 0" }} onClick={() => nav("/admin")}>
+            <button className="cta small" style={{ margin: "12px auto 0" }} data-hint="profile-admin" onClick={() => nav("/admin")}>
               Admin Console
             </button>
           )}
@@ -38,6 +38,7 @@ export function Profile() {
           <button
             key={p.id}
             className={p.id === user.id ? "list-item current-user" : "list-item"}
+            data-hint="profile-switch"
             onClick={() => {
               dispatch({ type: "LOGIN", userId: p.id });
               toast(dispatch, `Now viewing as ${p.fullName}`);
@@ -473,7 +474,7 @@ export function Admin() {
               </p>
               <p className="tiny">Status: {status}</p>
               <div className="row">
-                <button className="cta small" onClick={() => dispatch({ type: "GOV", id: g.id, status: "Published" })}>
+                <button className="cta small" data-hint="admin-confirm" onClick={() => dispatch({ type: "GOV", id: g.id, status: "Published" })}>
                   Confirm
                 </button>
                 <button className="cta small ghost" onClick={() => dispatch({ type: "GOV", id: g.id, status: "Archived" })}>

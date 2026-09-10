@@ -22,6 +22,7 @@ export function Login({ onIn }: { onIn: () => void }) {
           {personas.map((p) => (
             <button
               key={p.id}
+              data-hint={`login-${p.id}`}
               className={pick === p.id ? "persona-pick on" : "persona-pick"}
               onClick={() => setPick(p.id)}
             >
@@ -36,6 +37,7 @@ export function Login({ onIn }: { onIn: () => void }) {
         </div>
         <button
           className="cta"
+          data-hint="login-go"
           onClick={() => {
             dispatch({ type: "LOGIN", userId: selected.id });
             toast(dispatch, `Signed in as ${selected.fullName}`);

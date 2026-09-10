@@ -26,22 +26,22 @@ export function Workspace() {
         </h1>
         <p className="muted">{user.homeFocus}</p>
         <div className="stats" style={{ background: "#fff", borderRadius: 16, padding: 8, marginBottom: 12 }}>
-          <button className="stat" onClick={() => (manager ? setTab("Pending") : nav("/services/it"))}>
+          <button className="stat" data-hint="ws-pending" onClick={() => (manager ? setTab("Pending") : nav("/services/it"))}>
             <span>{manager ? "Pending" : support ? "Tickets" : "My leave"}</span>
             <b className="bad">{manager ? pendingCount : support ? openTickets.length : user.leaveDays}</b>
           </button>
-          <button className="stat" onClick={() => nav("/services/leave")}>
+          <button className="stat" data-hint="ws-leave" onClick={() => nav("/services/leave")}>
             <span>Leave</span>
             <b>{user.leaveDays}d</b>
           </button>
-          <button className="stat" onClick={() => nav("/workspace/payslips")}>
+          <button className="stat" data-hint="ws-paystat" onClick={() => nav("/workspace/payslips")}>
             <span>Payslips</span>
             <b>{user.nets}</b>
           </button>
         </div>
         {manager ? (
           <>
-            <div className="filters">
+            <div className="filters" data-hint="ws-filters">
               {filters.map((f) => (
                 <button key={f} className={tab === f ? "filter on" : "filter"} onClick={() => setTab(f)}>
                   {f}
@@ -51,7 +51,7 @@ export function Workspace() {
             <div className="list">
               {items.length === 0 && <div className="card muted">Nothing in {tab.toLowerCase()}.</div>}
               {items.map((a) => (
-                <button key={a.id} className="list-item" onClick={() => nav(`/approvals/${a.id}`)}>
+                <button key={a.id} className="list-item" data-hint="ws-row" onClick={() => nav(`/approvals/${a.id}`)}>
                   <div className="sys-mark" style={{ background: "#fef2f2", color: "#f40009" }}>
                     {a.type.slice(0, 3).toUpperCase()}
                   </div>
@@ -129,14 +129,14 @@ export function Workspace() {
         <div className="section-title">
           <h3>My documents</h3>
         </div>
-        <button className="list-item" onClick={() => nav("/workspace/payslips")}>
+        <button className="list-item" data-hint="ws-payslips" onClick={() => nav("/workspace/payslips")}>
           <Icon name="payments" />
           <div>
             <h4>Payslips</h4>
             <div className="tiny">Last credited · Net {user.nets}</div>
           </div>
         </button>
-        <button className="list-item" onClick={() => nav("/learning")}>
+        <button className="list-item" data-hint="ws-training" onClick={() => nav("/learning")}>
           <Icon name="school" />
           <div>
             <h4>Training status</h4>
@@ -188,13 +188,13 @@ export function ApprovalDetail() {
         </div>
         {a.status === "Pending" ? (
           <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
-            <button className="cta" onClick={() => act("Approved", `${a.id} approved`)}>
+            <button className="cta" data-hint="appr-approve" onClick={() => act("Approved", `${a.id} approved`)}>
               Approve
             </button>
-            <button className="cta ghost" onClick={() => act("Changes requested", `Changes requested on ${a.id}`)}>
+            <button className="cta ghost" data-hint="appr-changes" onClick={() => act("Changes requested", `Changes requested on ${a.id}`)}>
               Request changes
             </button>
-            <button className="cta ghost" onClick={() => act("Rejected", `${a.id} rejected`)}>
+            <button className="cta ghost" data-hint="appr-reject" onClick={() => act("Rejected", `${a.id} rejected`)}>
               Reject
             </button>
           </div>
@@ -221,6 +221,7 @@ export function Payslips() {
             <button
               key={m}
               className="list-item"
+              data-hint="pay-download"
               onClick={() => {
                 const blob = new Blob(
                   [`HCCB Payslip — ${m}\nEmployee: ${user.fullName}\nEmp ID: ${user.empId}\nNet pay: ${user.nets}\nThis is a demo document.`],

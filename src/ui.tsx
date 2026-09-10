@@ -32,14 +32,14 @@ export function TopBar({ title = "Home" }: { title?: string }) {
         <img src="/coca-cola.svg" alt="Coca-Cola" />
         <span className="nav-title">{title}</span>
       </div>
-      <button className="icon-btn" aria-label="Search" onClick={() => nav("/search")}>
+      <button className="icon-btn" data-hint="nav-search" aria-label="Search" onClick={() => nav("/search")}>
         <Icon name="search" />
       </button>
-      <button className="icon-btn" aria-label="Notifications" onClick={() => nav("/notifications")}>
+      <button className="icon-btn" data-hint="nav-alerts" aria-label="Notifications" onClick={() => nav("/notifications")}>
         <Icon name="notifications" />
         {unread > 0 && <span className="badge">{unread}</span>}
       </button>
-      <button className="icon-btn" aria-label="Profile" onClick={() => nav("/profile")} style={{ padding: 0, background: "transparent" }}>
+      <button className="icon-btn" data-hint="nav-profile" aria-label="Profile" onClick={() => nav("/profile")} style={{ padding: 0, background: "transparent" }}>
         <img className="avatar" src={user.avatar} alt={user.fullName} />
       </button>
     </header>
@@ -74,7 +74,7 @@ export function TabBar() {
               ? loc.pathname.startsWith("/workspace") || loc.pathname.startsWith("/approvals")
               : loc.pathname === t.to || loc.pathname.startsWith(t.to + "/");
         return (
-          <NavLink key={t.to} to={t.to} className={active ? "tab active" : "tab"}>
+          <NavLink key={t.to} to={t.to} data-hint={`tab-${t.label}`} className={active ? "tab active" : "tab"}>
             <Icon name={t.icon} fill={active} />
             {t.spark && <i className="spark" />}
             {dict[t.label] ?? t.label}
@@ -90,7 +90,7 @@ export function ScreenHeader({ title, back }: { title: string; back?: boolean })
   return (
     <div className="topbar" style={{ paddingTop: 4 }}>
       {back !== false && (
-        <button className="back" onClick={() => nav(-1)}>
+        <button className="back" data-hint="nav-back" onClick={() => nav(-1)}>
           <Icon name="chevron_left" />
           Back
         </button>

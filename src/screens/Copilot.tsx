@@ -55,14 +55,14 @@ export function Copilot() {
             Hello {user.firstName} — ask in plain language
             </h1>
           </div>
-          <button className="link" onClick={() => dispatch({ type: "CLEAR_COPILOT" })}>
+          <button className="link" data-hint="copilot-new" onClick={() => dispatch({ type: "CLEAR_COPILOT" })}>
             New chat
           </button>
         </div>
         {slice.copilot.length === 0 &&
           !typing &&
           starters.map((s) => (
-            <button key={s} className="list-item" onClick={() => ask(s)}>
+            <button key={s} className="list-item" data-hint="copilot-starter" onClick={() => ask(s)}>
               <Icon name="auto_awesome" />
               <div>
                 <h4>{s}</h4>
@@ -97,6 +97,7 @@ export function Copilot() {
         )}
         <form
           className="searchbar"
+          data-hint="copilot-ask"
           onSubmit={(e) => {
             e.preventDefault();
             ask(input);

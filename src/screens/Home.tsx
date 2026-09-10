@@ -26,26 +26,26 @@ export function Home() {
 
   const actions = plant
     ? [
-        { label: "Punch / Attendance", icon: "schedule", bg: "#ecfdf5", color: "#059669", to: "/services/attendance", dot: true },
-        { label: "Request Leave", icon: "calendar_month", bg: "#fef2f2", color: "#f40009", to: "/services/leave" },
-        { label: "Plant SOP", icon: "menu_book", bg: "#0f172a", color: "#fff", to: "/knowledge" },
-        { label: "Payslip", icon: "receipt_long", bg: "#eff6ff", color: "#2563eb", to: "/workspace/payslips" },
-        { label: "IT Ticket", icon: "confirmation_number", bg: "#fffbeb", color: "#d97706", to: "/services/it" },
+        { hint: "qa-attendance", label: "Punch / Attendance", icon: "schedule", bg: "#ecfdf5", color: "#059669", to: "/services/attendance", dot: true },
+        { hint: "qa-leave", label: "Request Leave", icon: "calendar_month", bg: "#fef2f2", color: "#f40009", to: "/services/leave" },
+        { hint: "qa-knowledge", label: "Plant SOP", icon: "menu_book", bg: "#0f172a", color: "#fff", to: "/knowledge" },
+        { hint: "qa-payslips", label: "Payslip", icon: "receipt_long", bg: "#eff6ff", color: "#2563eb", to: "/workspace/payslips" },
+        { hint: "qa-it", label: "IT Ticket", icon: "confirmation_number", bg: "#fffbeb", color: "#d97706", to: "/services/it" },
       ]
     : support
       ? [
-          { label: "Ticket queue", icon: "confirmation_number", bg: "#eff6ff", color: "#2563eb", to: "/workspace", dot: true },
-          { label: "Employee letters", icon: "mail", bg: "#fef2f2", color: "#f40009", to: "/services/letters" },
-          { label: "Communities", icon: "groups", bg: "#ecfdf5", color: "#059669", to: "/communities" },
-          { label: "Raise IT Ticket", icon: "computer", bg: "#f5f3ff", color: "#7c3aed", to: "/services/it" },
-          { label: "Request Leave", icon: "calendar_month", bg: "#fffbeb", color: "#d97706", to: "/services/leave" },
+          { hint: "qa-tickets", label: "Ticket queue", icon: "confirmation_number", bg: "#eff6ff", color: "#2563eb", to: "/workspace", dot: true },
+          { hint: "qa-letters", label: "Employee letters", icon: "mail", bg: "#fef2f2", color: "#f40009", to: "/services/letters" },
+          { hint: "qa-communities", label: "Communities", icon: "groups", bg: "#ecfdf5", color: "#059669", to: "/communities" },
+          { hint: "qa-it", label: "Raise IT Ticket", icon: "computer", bg: "#f5f3ff", color: "#7c3aed", to: "/services/it" },
+          { hint: "qa-leave", label: "Request Leave", icon: "calendar_month", bg: "#fffbeb", color: "#d97706", to: "/services/leave" },
         ]
       : [
-          { label: "Review queue", icon: "fact_check", bg: "#fef2f2", color: "#f40009", to: "/workspace", dot: manager },
-          { label: "Request Leave", icon: "calendar_month", bg: "#eff6ff", color: "#2563eb", to: "/services/leave" },
-          { label: "Book Travel", icon: "flight", bg: "#f5f3ff", color: "#7c3aed", to: "/services/travel" },
-          { label: "Payslips", icon: "receipt_long", bg: "#ecfdf5", color: "#059669", to: "/workspace/payslips" },
-          { label: "Admin", icon: "admin_panel_settings", bg: "#0f172a", color: "#fff", to: "/admin" },
+          { hint: "qa-workspace", label: "Review queue", icon: "fact_check", bg: "#fef2f2", color: "#f40009", to: "/workspace", dot: manager },
+          { hint: "qa-leave", label: "Request Leave", icon: "calendar_month", bg: "#eff6ff", color: "#2563eb", to: "/services/leave" },
+          { hint: "qa-travel", label: "Book Travel", icon: "flight", bg: "#f5f3ff", color: "#7c3aed", to: "/services/travel" },
+          { hint: "qa-payslips", label: "Payslips", icon: "receipt_long", bg: "#ecfdf5", color: "#059669", to: "/workspace/payslips" },
+          { hint: "qa-admin", label: "Admin", icon: "admin_panel_settings", bg: "#0f172a", color: "#fff", to: "/admin" },
         ];
 
   const systems = plant
@@ -93,7 +93,7 @@ export function Home() {
           </span>
           <span className="chip">{user.lane}</span>
           {isAdmin(user) && (
-            <button className="chip dark" onClick={() => nav("/admin")}>
+            <button className="chip dark" data-hint="home-admin" onClick={() => nav("/admin")}>
               <Icon name="admin_panel_settings" size={16} /> Admin Console
             </button>
           )}
@@ -112,7 +112,7 @@ export function Home() {
               {creditN} credit · {travelN} travel · {leaveN} leave
             </p>
             <div className="row">
-              <button className="cta" style={{ flex: 1 }} onClick={() => nav("/workspace")}>
+              <button className="cta" data-hint="home-review" style={{ flex: 1 }} onClick={() => nav("/workspace")}>
                 Review in Workspace <Icon name="arrow_forward" size={18} />
               </button>
               <button className="icon-round" onClick={() => nav("/notifications")} aria-label="Reminders">
@@ -120,17 +120,17 @@ export function Home() {
               </button>
             </div>
             <div className="stats">
-              <button className="stat" onClick={() => nav("/services/leave")}>
+              <button className="stat" data-hint="home-leave" onClick={() => nav("/services/leave")}>
                 <span>Leave Balance</span>
                 <b>
                   {user.leaveDays} <span className="tiny">days</span>
                 </b>
               </button>
-              <button className="stat" onClick={() => nav("/learning")}>
+              <button className="stat" data-hint="home-train" onClick={() => nav("/learning")}>
                 <span>Training</span>
                 <b className="good">{training}%</b>
               </button>
-              <button className="stat" onClick={() => nav("/admin")}>
+              <button className="stat" data-hint="home-gov" onClick={() => nav("/admin")}>
                 <span>Governance</span>
                 <b>4</b>
               </button>
@@ -147,21 +147,21 @@ export function Home() {
             <p className="tiny" style={{ color: "#94a3b8" }}>
               Sign before shift start · {user.location}
             </p>
-            <button className="cta" onClick={() => nav("/knowledge")}>
+            <button className="cta" data-hint="home-sop" onClick={() => nav("/knowledge")}>
               Open Knowledge Hub
             </button>
             <div className="stats" style={{ background: "transparent", marginTop: 10 }}>
-              <button className="stat" style={{ color: "#fff" }} onClick={() => nav("/services/leave")}>
+              <button className="stat" style={{ color: "#fff" }} data-hint="home-leave" onClick={() => nav("/services/leave")}>
                 <span>Leave</span>
                 <b>
                   {user.leaveDays}d
                 </b>
               </button>
-              <button className="stat" style={{ color: "#fff" }} onClick={() => nav("/learning")}>
+              <button className="stat" style={{ color: "#fff" }} data-hint="home-train" onClick={() => nav("/learning")}>
                 <span>Training</span>
                 <b>{training}%</b>
               </button>
-              <button className="stat" style={{ color: "#fff" }} onClick={() => nav("/services/attendance")}>
+              <button className="stat" style={{ color: "#fff" }} data-hint="home-punch" onClick={() => nav("/services/attendance")}>
                 <span>Punch</span>
                 <b>09:04</b>
               </button>
@@ -175,23 +175,23 @@ export function Home() {
             </h2>
             <p className="muted">{user.homeFocus}</p>
             <div className="row">
-              <button className="cta" style={{ flex: 1 }} onClick={() => nav("/workspace")}>
+              <button className="cta" data-hint="home-tickets" style={{ flex: 1 }} onClick={() => nav("/workspace")}>
                 Open queue
               </button>
-              <button className="cta ghost" style={{ flex: 1 }} onClick={() => nav("/communities")}>
+              <button className="cta ghost" data-hint="home-communities" style={{ flex: 1 }} onClick={() => nav("/communities")}>
                 Communities
               </button>
             </div>
             <div className="stats">
-              <button className="stat" onClick={() => nav("/services/leave")}>
+              <button className="stat" data-hint="home-leave" onClick={() => nav("/services/leave")}>
                 <span>My leave</span>
                 <b>{user.leaveDays}d</b>
               </button>
-              <button className="stat" onClick={() => nav("/learning")}>
+              <button className="stat" data-hint="home-train" onClick={() => nav("/learning")}>
                 <span>Training</span>
                 <b className="good">{training}%</b>
               </button>
-              <button className="stat" onClick={() => nav("/services/letters")}>
+              <button className="stat" data-hint="home-letters" onClick={() => nav("/services/letters")}>
                 <span>Letters</span>
                 <b>{slice.letters.length}</b>
               </button>
@@ -205,7 +205,7 @@ export function Home() {
         </div>
         <div className="qa">
           {actions.map((a) => (
-            <button key={a.label} className="qa-item" onClick={() => nav(a.to)}>
+            <button key={a.label} className="qa-item" data-hint={a.hint} onClick={() => nav(a.to)}>
               <div className="qa-ico" style={{ background: a.bg, color: a.color, position: "relative" }}>
                 <Icon name={a.icon} size={20} />
                 {a.dot && (
@@ -229,13 +229,13 @@ export function Home() {
 
         <div className="section-title">
           <h3>Core Systems</h3>
-          <button className="link" onClick={() => nav("/apps")}>
+          <button className="link" data-hint="home-apps" onClick={() => nav("/apps")}>
             All Tools
           </button>
         </div>
         <div className="systems">
           {systems.map((s) => (
-            <button key={s.id} className="sys" onClick={() => nav(`/apps/${s.id}`)}>
+            <button key={s.id} className="sys" data-hint={`sys-${s.id}`} onClick={() => nav(`/apps/${s.id}`)}>
               <div className="sys-mark" style={{ background: s.bg, color: s.c }}>
                 {s.t}
               </div>
@@ -247,7 +247,7 @@ export function Home() {
           ))}
         </div>
 
-        <div className="copilot-card">
+        <div className="copilot-card" data-hint="home-copilot">
           <div className="between">
             <div className="row">
               <Icon name="auto_awesome" />
@@ -290,7 +290,7 @@ export function Home() {
             View All
           </button>
         </div>
-        <button className="news-hero" onClick={() => nav(`/news/${hero.id}`)}>
+        <button className="news-hero" data-hint="home-news" onClick={() => nav(`/news/${hero.id}`)}>
           <img src="/people/plant.jpg" alt="HCCB plant" />
           <div className="body">
             <span className="pill">{hero.category}</span>
@@ -349,7 +349,7 @@ export function Home() {
             </button>
           </div>
         </div>
-        <button className="list-item" style={{ marginTop: 12 }} onClick={() => nav("/communities")}>
+        <button className="list-item" style={{ marginTop: 12 }} data-hint="home-communities" onClick={() => nav("/communities")}>
           <Icon name="groups" />
           <div>
             <h4>Communities</h4>

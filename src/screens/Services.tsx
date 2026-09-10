@@ -27,7 +27,7 @@ export function Services() {
               {filtered
                 .filter((s) => s.group === g)
                 .map((s) => (
-                  <button key={s.id} className="list-item" onClick={() => nav(s.to)}>
+                  <button key={s.id} className="list-item" data-hint={["leave", "payslip", "letters", "travel", "attendance", "it", "mfg"].includes(s.id) ? `svc-${s.id}` : undefined} onClick={() => nav(s.to)}>
                     <Icon name={s.icon} />
                     <div style={{ flex: 1, textAlign: "left" }}>
                       <h4>{s.name}</h4>
@@ -84,6 +84,7 @@ export function LeaveForm() {
         <p className="muted">{days} day(s) will be deducted if approved.</p>
         <button
           className="cta"
+          data-hint="leave-submit"
           onClick={() => {
             dispatch({
               type: "ADD_LEAVE",
@@ -179,6 +180,7 @@ export function TicketForm() {
         </div>
         <button
           className="cta"
+          data-hint="it-submit"
           disabled={!title.trim()}
           onClick={() => {
             const id = `INC-${21000 + slice.tickets.length}`;
@@ -252,6 +254,7 @@ export function TravelForm() {
         </div>
         <button
           className="cta"
+          data-hint="travel-submit"
           onClick={() => {
             const id = `TR-${900 + slice.travels.length}`;
             dispatch({

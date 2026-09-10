@@ -22,7 +22,7 @@ export function Knowledge() {
             <p className="tiny" style={{ color: "#94a3b8" }}>
               Level 3 PPE · dual lockout on Line 2 · eyewash test 06:00
             </p>
-            <button className="cta" onClick={() => nav("/knowledge/" + (knowledgeDocs.find((d) => d.type === "SOP")?.id ?? knowledgeDocs[0].id))}>
+            <button className="cta" data-hint="kn-sop" onClick={() => nav("/knowledge/" + (knowledgeDocs.find((d) => d.type === "SOP")?.id ?? knowledgeDocs[0].id))}>
               1-tap sign SOP
             </button>
           </div>
@@ -30,14 +30,14 @@ export function Knowledge() {
         <h1 className="h1">Policies & SOPs</h1>
         <div className="filters">
           {types.map((t) => (
-            <button key={t} className={type === t ? "filter on" : "filter"} onClick={() => setType(t)}>
+            <button key={t} data-hint={t === "SOP" ? "kn-sop-filter" : undefined} className={type === t ? "filter on" : "filter"} onClick={() => setType(t)}>
               {t}
             </button>
           ))}
         </div>
         <div className="list">
           {list.map((d) => (
-            <button key={d.id} className="list-item" onClick={() => nav(`/knowledge/${d.id}`)}>
+            <button key={d.id} className="list-item" data-hint="kn-doc" onClick={() => nav(`/knowledge/${d.id}`)}>
               <Icon name="description" />
               <div style={{ flex: 1, textAlign: "left" }}>
                 <h4>{d.title}</h4>
@@ -88,7 +88,7 @@ export function KnowledgeDetail() {
             >
               {saved ? "Bookmarked" : "Bookmark"}
             </button>
-            <button className="cta small ghost" onClick={() => nav(`/copilot?q=${encodeURIComponent("Summarize " + doc.title)}`)}>
+            <button className="cta small ghost" data-hint="kn-ai" onClick={() => nav(`/copilot?q=${encodeURIComponent("Summarize " + doc.title)}`)}>
               AI summary
             </button>
           </div>
@@ -105,6 +105,7 @@ export function KnowledgeDetail() {
         </div>
         <button
           className="cta"
+          data-hint="kn-ack"
           disabled={acked}
           onClick={() => {
             setAcked(true);

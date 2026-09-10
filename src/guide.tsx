@@ -1,463 +1,237 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Icon } from "./ui";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { isAdmin, isManager, isPlant, type Persona } from "./personas";
 import { useHub } from "./store";
 
-export type GuidePage = {
-  title: string;
-  now: string;
-  doThis: string[];
-  next: { label: string; to: string }[];
-};
+type HintCopy = { title: string; body: string };
 
-function page(path: string, user: Persona, pendingId?: string): GuidePage {
+function hintFor(
+  id: string,
+  user: Persona,
+  pendingCount: number,
+  unread: number,
+): HintCopy | null {
   const mgr = isManager(user);
   const plant = isPlant(user);
   const admin = isAdmin(user);
 
-  if (path === "/login") {
-    return {
-      title: "Sign in",
-      now: "Pick a lane. Each user opens a different Hub — corporate queue, plant SOP, or support desk.",
-      doThis: ["Tap a person", "Continue to land on their Home"],
-      next: [
-        { label: "Corporate — Avinash", to: "/login" },
-        { label: "Plant — Ramesh", to: "/login" },
-        { label: "Support — Priya", to: "/login" },
-      ],
-    };
-  }
-  if (path === "/") {
-    return {
-      title: "Home",
-      now: mgr
-        ? "Your corporate landing. The red card is the live approval queue. Chips and shortcuts match HQ work."
-        : plant
-          ? "Shift landing. Sign the SOP before work, then punch, leave, or pay."
-          : "Support landing. Open employee tickets, letters, and communities from here.",
-      doThis: mgr
-        ? ["Review the queue", "Open Admin if you need governance", "Ask Copilot about leave or credit"]
-        : plant
-          ? ["Open Knowledge Hub for CIP", "Punch attendance", "Check leave days"]
-          : ["Open the ticket queue", "Jump to Communities", "Issue a letter"],
-      next: mgr
-        ? [
-            { label: "Workspace queue", to: "/workspace" },
-            { label: "Admin Console", to: "/admin" },
-            { label: "Ask Copilot", to: "/copilot" },
-          ]
-        : plant
-          ? [
-              { label: "Knowledge / SOP", to: "/knowledge" },
-              { label: "Attendance", to: "/services/attendance" },
-              { label: "Payslips", to: "/workspace/payslips" },
-            ]
-          : [
-              { label: "Ticket queue", to: "/workspace" },
-              { label: "Communities", to: "/communities" },
-              { label: "Letters", to: "/services/letters" },
-            ],
-    };
-  }
-  if (path === "/workspace") {
-    return {
-      title: "Workspace",
-      now: mgr
-        ? "Team requests sit here. Filter Pending → open a row → Approve, reject, or request changes."
-        : "Your own tickets, leave, and documents. Nothing in the manager queue on this account.",
-      doThis: mgr
-        ? ["Tap a credit or leave row", "Use filters including Changes requested", "Open payslips at the bottom"]
-        : ["Check ticket status", "Open payslips", "Submit leave from Services"],
-      next: mgr
-        ? [
-            { label: pendingId ? `Open ${pendingId}` : "Queue", to: pendingId ? `/approvals/${pendingId}` : "/workspace" },
-            { label: "Payslips", to: "/workspace/payslips" },
-            { label: "Learning", to: "/learning" },
-          ]
-        : [
-            { label: "Raise IT ticket", to: "/services/it" },
-            { label: "Payslips", to: "/workspace/payslips" },
-            { label: "Home", to: "/" },
-          ],
-    };
-  }
-  if (path.startsWith("/approvals/")) {
-    return {
-      title: "Approval",
-      now: "One request. Read the summary, then Approve, Request changes, or Reject. The count on Home updates.",
-      doThis: ["Approve to drop pending", "Request changes if papers are missing", "Back arrow returns to the queue"],
-      next: [
-        { label: "Back to queue", to: "/workspace" },
-        { label: "Home", to: "/" },
-      ],
-    };
-  }
-  if (path === "/workspace/payslips") {
-    return {
-      title: "Payslips",
-      now: `Official copies for ${user.fullName}. Net pay is ${user.nets}. Tap a month to download a demo file.`,
-      doThis: ["Download a month", "Confirm the name matches this user"],
-      next: [
-        { label: "Workspace", to: "/workspace" },
-        { label: "Leave", to: "/services/leave" },
-      ],
-    };
-  }
-  if (path === "/services") {
-    return {
-      title: "Services",
-      now: "Catalog of HR, IT, and work hubs. Search or open a row — each form writes into this user’s record.",
-      doThis: ["Request leave", "Raise an IT ticket", "Open Manufacturing Hub for plant SOPs"],
-      next: [
-        { label: "Leave", to: "/services/leave" },
-        { label: "IT ticket", to: "/services/it" },
-        { label: "Travel", to: "/services/travel" },
-      ],
-    };
-  }
-  if (path === "/services/leave") {
-    return {
-      title: "Request leave",
-      now: `Balance on this account is ${user.leaveDays} days. Submit sends a Pending item to the corporate queue.`,
-      doThis: ["Set dates", "Submit request", "Switch to Avinash to see it in Workspace"],
-      next: [
-        { label: "Workspace", to: "/workspace" },
-        { label: "Leave policy", to: "/knowledge/pol-leave" },
-      ],
-    };
-  }
-  if (path === "/services/it") {
-    return {
-      title: "IT ticket",
-      now: "Creates an INC in this user’s queue. Support (Priya) already has plant and HQ tickets assigned.",
-      doThis: ["Add a summary (required)", "Submit for an INC number", "Track it in Workspace"],
-      next: [
-        { label: "Workspace", to: "/workspace" },
-        { label: "ServiceNow app", to: "/apps/snow" },
-      ],
-    };
-  }
-  if (path === "/services/travel") {
-    return {
-      title: "Book travel",
-      now: "Policy is on the card. Submit also creates a Travel approval for the manager.",
-      doThis: ["Edit destination", "Open the travel policy", "Submit for approval"],
-      next: [
-        { label: "Travel policy", to: "/knowledge/pol-travel" },
-        { label: "Workspace", to: "/workspace" },
-      ],
-    };
-  }
-  if (path.startsWith("/services/jobs")) {
-    return {
-      title: "Internal jobs",
-      now: "Mobility roles. Apply stays on this user so you can show ‘Applied’.",
-      doThis: ["Open a role", "Tap Apply once"],
-      next: [{ label: "Services", to: "/services" }],
-    };
-  }
-  if (path === "/services/letters") {
-    return {
-      title: "Letters",
-      now: "HR letters for this employee. Support can demo this from Home.",
-      doThis: ["Request employment / address / salary"],
-      next: [{ label: "Support Home", to: "/" }],
-    };
-  }
-  if (path === "/services/attendance") {
-    return {
-      title: "Attendance",
-      now: `Punch source is ${user.location}. Plant users start here after the SOP.`,
-      doThis: ["Read the month summary", "Return Home or open leave"],
-      next: [
-        { label: "Leave", to: "/services/leave" },
-        { label: "Home", to: "/" },
-      ],
-    };
-  }
-  if (path === "/knowledge" || path.startsWith("/knowledge/")) {
-    return {
-      title: path === "/knowledge" ? "Knowledge" : "Document",
-      now: plant
-        ? "Plant SOP is pinned at the top. 1-tap sign, then acknowledge inside the document."
-        : "Policies and SOPs. Bookmark or ask Copilot for a summary.",
-      doThis: path === "/knowledge"
-        ? ["Filter SOP / Policy", "Open Plant Safety", "Use AI summary on a doc"]
-        : ["Bookmark", "Acknowledge", "Open a related doc"],
-      next: [
-        { label: "Plant Safety SOP", to: "/knowledge/sop-plant-safety" },
-        { label: "Copilot", to: "/copilot" },
-      ],
-    };
-  }
-  if (path === "/copilot") {
-    return {
-      title: "Copilot",
-      now: "Answers use this user’s leave days and whether they are a manager. Sources open Knowledge.",
-      doThis: ["Ask leave balance", "Ask plant SOP", "Follow a source link"],
-      next: [
-        { label: "Leave policy", to: "/knowledge/pol-leave" },
-        { label: "Home", to: "/" },
-      ],
-    };
-  }
-  if (path === "/admin") {
-    return {
-      title: "Admin Console",
-      now: admin
-        ? "Content governance. Confirm, archive, or send for approval — only this corporate admin can act."
-        : "Restricted. Switch to Avinash on Profile to open governance.",
-      doThis: admin ? ["Confirm an overdue policy", "Archive a doc"] : ["Open Profile", "Switch to Avinash"],
-      next: admin
-        ? [{ label: "Home", to: "/" }, { label: "Knowledge", to: "/knowledge" }]
-        : [{ label: "Switch user", to: "/profile" }],
-    };
-  }
-  if (path === "/profile") {
-    return {
-      title: "Profile",
-      now: "Employee card plus Switch demo user. More links to Communities, Learning, and Analytics live here.",
-      doThis: ["Switch lane", "Open Communities", "Change language for the tab bar"],
-      next: [
-        { label: "Communities", to: "/communities" },
-        { label: "Learning", to: "/learning" },
-        { label: "Sign in screen", to: "/login" },
-      ],
-    };
-  }
-  if (path === "/notifications") {
-    return {
+  const table: Record<string, HintCopy> = {
+    "login-avinash": {
+      title: "Corporate + Admin",
+      body: "HQ Home with the live approval queue and Admin Console.",
+    },
+    "login-ramesh": {
+      title: "Plant floor",
+      body: "Shift Home: sign CIP SOP, then punch, leave, and pay.",
+    },
+    "login-priya": {
+      title: "Employee support",
+      body: "Shared Services Home: tickets, letters, and communities.",
+    },
+    "login-go": { title: "Enter the Hub", body: "Opens that person’s Home — queues and tools follow the lane." },
+    "nav-search": { title: "Search", body: "Find policies, people, news, and apps across the Hub." },
+    "nav-alerts": {
       title: "Notifications",
-      now: "Inbox is unique to this user. Plant sees SOP reminders; corporate sees the approval stack.",
-      doThis: ["Open a row", "Filter by category", "Mark all read"],
-      next: [{ label: "Home", to: "/" }],
-    };
-  }
-  if (path === "/apps" || path.startsWith("/apps/")) {
-    return {
-      title: path === "/apps" ? "All tools" : "App session",
-      now: "SSO is simulated. Star favorites. Open keeps you in Hub with a snapshot — it does not bounce to Home.",
-      doThis: ["Search an app", "Star ServiceNow or SAP", "Open the snapshot"],
-      next: [{ label: "All tools", to: "/apps" }, { label: "Home", to: "/" }],
-    };
-  }
-  if (path === "/news" || path.startsWith("/news/")) {
-    return {
-      title: "News",
-      now: "Company feed. The Home hero opens the sustainability story (same article).",
-      doThis: ["Open the hero story", "Mark as read"],
-      next: [{ label: "Recognition", to: "/recognition" }, { label: "Home", to: "/" }],
-    };
-  }
-  if (path === "/learning") {
-    return {
-      title: "Learning",
-      now: `Progress starts from ${user.training}% for this person. Continue adds 20% per tap.`,
-      doThis: ["Continue a required course"],
-      next: [{ label: "Home", to: "/" }],
-    };
-  }
-  if (path === "/communities") {
-    return {
-      title: "Communities",
-      now: "Always available from Home, Profile, and Support shortcuts. Join / Leave is local to the session.",
-      doThis: ["Join Run Club", "Leave a plant huddle"],
-      next: [{ label: "Recognition", to: "/recognition" }, { label: "Home", to: "/" }],
-    };
-  }
-  if (path === "/recognition") {
-    return {
-      title: "Recognition",
-      now: "Post kudos as the signed-in user. Feed is shared.",
-      doThis: ["Write a note", "Post"],
-      next: [{ label: "Home", to: "/" }],
-    };
-  }
-  if (path === "/search") {
-    return {
-      title: "Search",
-      now: "Finds policies, news, people (all three demo users), and apps. AI overview respects this role.",
-      doThis: ["Try “Ramesh” or “leave policy”"],
-      next: [{ label: "Copilot", to: "/copilot" }],
-    };
-  }
-  if (path === "/analytics" || path === "/sales" || path === "/manufacturing" || path === "/supply-chain") {
-    return {
-      title: path === "/analytics" ? "Analytics" : "Work hub",
-      now: "Deep links from Services. Manufacturing Hub is the plant shortcut to SOP and tickets.",
-      doThis: ["Open a linked SOP or app"],
-      next: [{ label: "Services", to: "/services" }, { label: "Knowledge", to: "/knowledge" }],
-    };
-  }
-  return {
-    title: "HCCB Hub",
-    now: "Move with the tab bar or the arrows on either side of the phone.",
-    doThis: ["Open Home"],
-    next: [{ label: "Home", to: "/" }],
+      body: unread ? `${unread} unread for ${user.firstName}.` : "Inbox is unique to this signed-in user.",
+    },
+    "nav-profile": { title: "Profile", body: "Employee card, switch demo user, language, communities." },
+    "nav-back": { title: "Back", body: "Returns to the previous screen in this flow." },
+    "tab-Home": { title: "Home", body: "Landing for this lane — queue, SOP, or support desk." },
+    "tab-Workspace": {
+      title: "Workspace",
+      body: mgr ? "Team credit, travel, and leave to approve." : "Your tickets, leave, and payslips.",
+    },
+    "tab-Services": { title: "Services", body: "Request leave, travel, letters, IT, and work hubs." },
+    "tab-AI Copilot": { title: "AI Copilot", body: "Answers use this user’s leave days and whether they manage a queue." },
+    "tab-Knowledge": {
+      title: "Knowledge",
+      body: plant ? "Plant Safety SOP is pinned for 1-tap sign-off." : "Policies and SOPs. Bookmark or ask Copilot.",
+    },
+    "home-admin": { title: "Admin Console", body: admin ? "Governance: confirm, archive, send for approval." : "Restricted to the corporate admin persona." },
+    "home-review": {
+      title: "Approval queue",
+      body: `${pendingCount} pending — credit, travel, and leave from the plants and field.`,
+    },
+    "home-sop": { title: "Required SOP", body: "Open Knowledge and sign chemical / CIP safety before the shift." },
+    "home-tickets": { title: "Support queue", body: "Employee tickets assigned to Shared Services." },
+    "home-leave": { title: "Leave", body: `${user.leaveDays} days on this account. Submit sends a request to the manager.` },
+    "home-train": { title: "Learning", body: `Required modules sit at ${user.training}% for ${user.firstName}.` },
+    "home-gov": { title: "Governance", body: "Overdue policies for Admin Console." },
+    "home-punch": { title: "Attendance", body: `Punch source is ${user.location}.` },
+    "home-letters": { title: "Letters", body: "Employment, address, and salary letters for this employee." },
+    "home-communities": { title: "Communities", body: "Plant huddles, support desk, run club — join stays on this user." },
+    "home-copilot": { title: "Ask Copilot", body: "Plain-language leave, SOP, and ticket answers with sources." },
+    "home-news": { title: "Leadership news", body: "Same sustainability story as the News feed hero." },
+    "home-apps": { title: "All tools", body: "SSO is simulated. Open stays inside the Hub." },
+    "qa-workspace": { title: "Review queue", body: "Opens Workspace so you can approve or request changes." },
+    "qa-leave": { title: "Request leave", body: "Dates + submit → Pending on the corporate queue." },
+    "qa-travel": { title: "Book travel", body: "Creates a Travel approval for the manager." },
+    "qa-payslips": { title: "Payslips", body: `Official copies for ${user.fullName}.` },
+    "qa-admin": { title: "Admin", body: "Content governance for the corporate admin." },
+    "qa-attendance": { title: "Punch", body: "Month summary and last punch for this plant user." },
+    "qa-knowledge": { title: "Plant SOP", body: "Jump to Knowledge Hub and sign CIP." },
+    "qa-it": { title: "IT ticket", body: "Opens an INC on this user’s record." },
+    "qa-letters": { title: "Employee letters", body: "HR letters support can issue from Home." },
+    "qa-communities": { title: "Communities", body: "Join or leave groups for this session." },
+    "qa-tickets": { title: "Ticket queue", body: "Assigned employee tickets in Workspace." },
+    "sys-sap": { title: "SAP ERP", body: "Ops and supply snapshot — stays in Hub, no bounce to Home." },
+    "sys-crm": { title: "Sales CRM", body: "Field and outlet snapshot for commercial." },
+    "sys-pbi": { title: "Power BI", body: "Line OEE or commercial BI, depending on lane." },
+    "sys-hr": { title: "HR Portal", body: "People, letters, and employee services." },
+    "sys-snow": { title: "ServiceNow", body: "Plant or employee tickets through the Hub." },
+    "sys-lms": { title: "LMS", body: "Safety and required learning modules." },
+    "sys-teams": { title: "Teams", body: "Support huddles — launch stays in Hub." },
+    "ws-pending": {
+      title: mgr ? "Pending count" : "Open work",
+      body: mgr ? `${pendingCount} items waiting on you.` : "Your tickets or leave on this account.",
+    },
+    "ws-leave": { title: "Leave", body: `${user.leaveDays} days remaining.` },
+    "ws-paystat": { title: "Net pay", body: `Last credited ${user.nets}. Open payslips below.` },
+    "ws-filters": { title: "Filters", body: "Pending, approved, rejected, or changes requested." },
+    "ws-row": { title: "Open request", body: "Read the summary, then Approve, reject, or request changes." },
+    "ws-payslips": { title: "Payslips", body: "Download a demo month for this employee." },
+    "ws-training": { title: "Training", body: `Continue from ${user.training}%.` },
+    "appr-approve": { title: "Approve", body: "Clears this item; Home pending count drops." },
+    "appr-changes": { title: "Request changes", body: "Keeps the item in Workspace under Changes requested." },
+    "appr-reject": { title: "Reject", body: "Closes the request as Rejected." },
+    "svc-leave": { title: "Request Leave", body: "Writes into this user and the manager queue." },
+    "svc-payslip": { title: "Payslips", body: "Authorized copies for the signed-in name." },
+    "svc-letters": { title: "Employee letters", body: "Employment / address / salary — support demo." },
+    "svc-travel": { title: "Book Travel", body: "Policy on the card; submit creates an approval." },
+    "svc-attendance": { title: "Attendance", body: "Plant punch and month summary." },
+    "svc-it": { title: "Raise IT Ticket", body: "Creates an INC. Priya already has plant and HQ tickets." },
+    "svc-mfg": { title: "Manufacturing Hub", body: "Plant shortcut to SOP and tickets." },
+    "leave-submit": { title: "Submit leave", body: "Pending for Avinash. Switch user in Profile to see the queue." },
+    "it-submit": { title: "Submit ticket", body: "Gives an INC number you can track in Workspace." },
+    "travel-submit": { title: "Submit travel", body: "Creates a Travel approval for the manager." },
+    "kn-sop": { title: "1-tap SOP", body: "Required before shift on the plant account." },
+    "kn-sop-filter": { title: "SOP filter", body: "Show only operating procedures." },
+    "kn-doc": { title: "Open document", body: "Bookmark, acknowledge, or ask Copilot for a summary." },
+    "kn-ack": { title: "Acknowledge", body: "Records that this user read the SOP." },
+    "kn-ai": { title: "AI summary", body: "Sends this title to Copilot with sources." },
+    "copilot-new": { title: "New chat", body: "Clears this user’s Copilot thread." },
+    "copilot-ask": { title: "Ask", body: "Role-aware answer; sources open Knowledge." },
+    "copilot-starter": { title: "Suggested ask", body: "Runs a demo question using this user’s data." },
+    "profile-admin": { title: "Admin Console", body: "Only the corporate admin can act on governance." },
+    "profile-switch": { title: "Switch user", body: "Loads that lane’s Home, tickets, and leave." },
+    "admin-confirm": { title: "Confirm policy", body: "Marks governance Published for the audit trail." },
+    "pay-download": { title: "Download", body: "Demo file named for this employee." },
   };
+
+  return table[id] ?? null;
 }
 
-function titleOf(path: string) {
-  if (path === "/") return "Home";
-  if (path === "/login") return "Sign in";
-  const bit = path.split("/").filter(Boolean)[0];
-  const names: Record<string, string> = {
-    workspace: "Workspace",
-    approvals: "Approval",
-    services: "Services",
-    knowledge: "Knowledge",
-    copilot: "Copilot",
-    admin: "Admin",
-    profile: "Profile",
-    notifications: "Alerts",
-    apps: "Tools",
-    news: "News",
-    learning: "Learning",
-    communities: "Communities",
-    recognition: "Recognition",
-    search: "Search",
-    analytics: "Analytics",
-    sales: "Sales Hub",
-    manufacturing: "Plant Hub",
-    "supply-chain": "Supply Hub",
-  };
-  return names[bit ?? ""] ?? "Hub";
-}
+type Spot = { id: string; t: DOMRect; s: DOMRect };
 
-export function GuideStage({ children }: { children: ReactNode }) {
+export function HintStage({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const hold = useRef<HTMLElement | null>(null);
+  const [spot, setSpot] = useState<Spot | null>(null);
   const loc = useLocation();
-  const nav = useNavigate();
-  const { user, ready, state } = useHub();
-  const [trail, setTrail] = useState<{ path: string; title: string }[]>(() => {
-    try {
-      const raw = sessionStorage.getItem("hccb-guide-trail");
-      if (raw) return JSON.parse(raw) as { path: string; title: string }[];
-    } catch {
-      /* ignore */
-    }
-    return [];
-  });
-  const pendingId = state.approvals.find((a) => a.status === "Pending")?.id;
-  const guide = page(loc.pathname, user, pendingId);
-  const here = { path: loc.pathname, title: titleOf(loc.pathname) };
-  const shown = [...trail.filter((x) => x.path !== loc.pathname), here].slice(-4);
-  const back = shown.length > 1 ? shown[shown.length - 2] : null;
+  const { user, pendingCount, unread } = useHub();
+
+  const measure = (el: HTMLElement) => {
+    const root = ref.current;
+    if (!root) return;
+    hold.current = el;
+    setSpot({ id: el.dataset.hint ?? "", t: el.getBoundingClientRect(), s: root.getBoundingClientRect() });
+  };
+
+  const find = (n: EventTarget | null) => {
+    const root = ref.current;
+    if (!(n instanceof Element) || !root) return null;
+    const el = n.closest("[data-hint]");
+    if (el instanceof HTMLElement && el.dataset.hint && root.contains(el)) return el;
+    return null;
+  };
 
   useEffect(() => {
-    setTrail(shown);
-    try {
-      sessionStorage.setItem("hccb-guide-trail", JSON.stringify(shown));
-    } catch {
-      /* ignore */
-    }
-  }, [loc.pathname, user.id]);
+    setSpot(null);
+    hold.current = null;
+  }, [loc.pathname]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (hold.current && ref.current?.contains(hold.current)) measure(hold.current);
+      else setSpot(null);
+    };
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const copy = spot ? hintFor(spot.id, user, pendingCount, unread) : null;
 
   return (
-    <div className="stage">
-      <aside className="rail rail-left">
-        {ready && (
-          <>
-            <div className="rail-kicker">Came from</div>
-            <div className="rail-trail">
-              {shown.length === 0 && <span className="rail-muted">Start in the phone →</span>}
-              {shown.map((step, i) => (
-                <span key={step.path + i} className="rail-step">
-                  {i > 0 && (
-                    <span className="rail-arrow" aria-hidden>
-                      →
-                    </span>
-                  )}
-                  <button
-                    className={step.path === loc.pathname ? "rail-chip on" : "rail-chip"}
-                    onClick={() => nav(step.path)}
-                  >
-                    {step.title}
-                  </button>
-                </span>
-              ))}
-            </div>
-            {back && loc.pathname !== "/" && loc.pathname !== "/login" && (
-              <button className="rail-back" onClick={() => nav(back.path)}>
-                <Icon name="arrow_back" size={18} />
-                Back to {back.title}
-              </button>
-            )}
-            <div className="rail-kicker" style={{ marginTop: 22 }}>
-              You are here
-            </div>
-            <h2 className="rail-title">{guide.title}</h2>
-            <p className="rail-body">{guide.now}</p>
-            <div className="rail-kicker">On this screen</div>
-            <ul className="rail-list">
-              {guide.doThis.map((d) => (
-                <li key={d}>{d}</li>
-              ))}
-            </ul>
-            <div className="rail-pointer" aria-hidden>
-              →
-            </div>
-          </>
-        )}
-      </aside>
+    <div
+      className="stage"
+      ref={ref}
+      onMouseOver={(e) => {
+        const el = find(e.target);
+        if (el) measure(el);
+      }}
+      onMouseOut={(e) => {
+        const from = find(e.target);
+        const to = find(e.relatedTarget);
+        if (from && from !== to) {
+          if (to) measure(to);
+          else {
+            hold.current = null;
+            setSpot(null);
+          }
+        }
+      }}
+    >
       {children}
-      <aside className="rail rail-right">
-        {ready && (
-          <>
-            <div className="rail-pointer left" aria-hidden>
-              ←
-            </div>
-            <div className="rail-kicker">Go next</div>
-            <p className="rail-body" style={{ marginBottom: 12 }}>
-              {user.lane} · {user.firstName}
-            </p>
-            <div className="rail-next">
-              {guide.next.map((n) => (
-                <button key={n.to + n.label} className="rail-go" onClick={() => nav(n.to)}>
-                  <span>{n.label}</span>
-                  <Icon name="arrow_forward" size={18} />
-                </button>
-              ))}
-            </div>
-            <div className="rail-kicker" style={{ marginTop: 22 }}>
-              Tabs
-            </div>
-            <p className="rail-body">
-              Bottom bar: Home, Workspace, Services, Copilot, Knowledge. Header icons: Search, alerts, profile.
-            </p>
-          </>
-        )}
-      </aside>
+      {spot && copy && <HintPaint spot={spot} copy={copy} />}
     </div>
   );
 }
 
-export function PathStrip() {
-  const loc = useLocation();
-  const nav = useNavigate();
-  const { user, state } = useHub();
-  const pendingId = state.approvals.find((a) => a.status === "Pending")?.id;
-  const guide = page(loc.pathname, user, pendingId);
-  const canBack = loc.pathname !== "/";
-  const go = guide.next[0];
+function HintPaint({ spot, copy }: { spot: Spot; copy: HintCopy }) {
+  const { t, s } = spot;
+  const sw = s.width;
+  const sh = s.height;
+  const tx = t.left - s.left;
+  const ty = t.top - s.top;
+  const tcx = tx + t.width / 2;
+  const tcy = ty + t.height / 2;
+  const cardW = Math.min(236, Math.max(176, sw * 0.18));
+  const cardH = 92;
+  const gutter = 20;
+  const side: "left" | "right" = tcx < sw / 2 ? "left" : "right";
+  const cx = side === "left" ? gutter : sw - gutter - cardW;
+  const cy = Math.min(Math.max(gutter, tcy - cardH / 2), sh - cardH - gutter);
+  const startX = side === "left" ? cx + cardW - 4 : cx + 4;
+  const startY = cy + 36;
+  const endX = side === "left" ? tx - 8 : tx + t.width + 8;
+  const endY = tcy;
+  const span = endX - startX;
+  const bow = Math.max(48, Math.min(96, Math.abs(span) * 0.42));
+  const lift = (endY < sh / 2 ? 1 : -1) * bow;
+  const d = `M ${startX} ${startY} C ${startX + span * 0.3} ${startY + lift}, ${endX - span * 0.15} ${endY + lift * 0.35}, ${endX} ${endY}`;
+
   return (
-    <div className="path-strip">
-      <button
-        className={canBack ? "path-back" : "path-back ghost"}
-        aria-label={canBack ? "Go back" : "Home"}
-        onClick={() => (canBack ? nav(-1) : nav("/"))}
-      >
-        <Icon name="chevron_left" size={18} />
-      </button>
-      <div className="path-now">
-        <b>{guide.title}</b>
-        <span>{guide.doThis[0]}</span>
+    <div className="hint-layer" aria-hidden>
+      <div
+        className="hint-spot"
+        style={{ left: tx, top: ty, width: t.width, height: t.height }}
+      />
+      <svg className="hint-svg" viewBox={`0 0 ${sw} ${sh}`} width={sw} height={sh}>
+        <defs>
+          <marker id="hint-head" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0 0 L9 4.5 L0 9 Z" fill="#f40009" />
+          </marker>
+        </defs>
+        <path className="hint-curve" pathLength={1} d={d} markerEnd="url(#hint-head)" />
+      </svg>
+      <div className="hint-card on" style={{ left: cx, top: cy, width: cardW }}>
+        <b>{copy.title}</b>
+        <span>{copy.body}</span>
       </div>
-      {go && (
-        <button className="path-nudge" aria-label={go.label} onClick={() => nav(go.to)}>
-          <Icon name="arrow_forward" size={18} />
-        </button>
-      )}
     </div>
   );
 }
