@@ -8,12 +8,15 @@ import {
   type ReactNode,
 } from "react";
 import {
+  amaQuestions as seedAmaQuestions,
   initialApprovals,
+  type AmaQuestion,
   type Approval,
   type ApprovalStatus,
   type LeaveRequest,
   type Ticket,
 } from "./data";
+import { liveAnnouncementsFor, type Announcement } from "./data";
 import { defaultPersona, getPersona, isManager, personas, type Persona } from "./personas";
 
 export type Toast = { id: string; text: string; tone?: "ok" | "info" };
@@ -46,6 +49,18 @@ export type UserSlice = {
   newsRead: string[];
   letters: string[];
   courses: Record<string, number>;
+  /** Announcements this user has acknowledged (mandatory / policy notices). */
+  annAck: string[];
+  /** Announcements this user dismissed from the Home rail. */
+  annDismissed: string[];
+  /** Popups already served to this user — a popup shows once per announcement. */
+  annSeen: string[];
+  /** CEO Talks: questions this user submitted. */
+  amaAsked: AmaQuestion[];
+  /** CEO Talks: question ids this user upvoted. */
+  amaUpvotes: string[];
+  /** CEO Talks: sessions this user registered for. */
+  amaRegistered: string[];
 };
 
 type State = {
@@ -54,6 +69,8 @@ type State = {
   language: "English" | "हिन्दी" | "ಕನ್ನಡ";
   approvals: Approval[];
   governance: Record<string, "Published" | "Archived" | "In review">;
+  /** Admin Console: announcements paused by a content manager. */
+  annPaused: Record<string, boolean>;
   users: Record<string, UserSlice>;
   toasts: Toast[];
 };
@@ -91,6 +108,12 @@ function sliceFor(p: Persona): UserSlice {
     newsRead: [],
     letters: [],
     courses: coursesFrom(p.training),
+    annAck: [],
+    annDismissed: [],
+    annSeen: [],
+    amaAsked: [],
+    amaUpvotes: [],
+    amaRegistered: [],
   };
 
   if (p.id === "avinash") {
@@ -109,9 +132,11 @@ function sliceFor(p: Persona): UserSlice {
         },
       ],
       notifications: [
+        { id: "n0", title: "Festive safety stand-down", body: "Mandatory · acknowledge by 25 Sep", category: "Announcements", read: false, to: "/announcements/ann-festive-safety" },
         { id: "n1", title: "Approvals waiting", body: "Credit, travel and plant leave in your queue", category: "Approvals", read: false, to: "/workspace" },
-        { id: "n2", title: "Defensive driving due 22 Sep", body: `${p.training}% complete`, category: "Learning", read: false, to: "/learning" },
-        { id: "n3", title: "CEO note posted", body: "Safety first this festive season", category: "Company", read: false, to: "/news/n2" },
+        { id: "n2", title: "Credit Policy v3 published", body: "Approval limits revised above ₹5L", category: "Announcements", read: false, to: "/announcements/ann-credit-policy" },
+        { id: "n3", title: "CEO Talks · questions open", body: "September AMA on 24 Sep, 3:00 PM IST", category: "Leadership", read: false, to: "/ceo-talks" },
+        { id: "n4", title: "Defensive driving due 22 Sep", body: `${p.training}% complete`, category: "Learning", read: false, to: "/learning" },
       ],
     };
   }
@@ -133,9 +158,11 @@ function sliceFor(p: Persona): UserSlice {
         },
       ],
       notifications: [
+        { id: "n0", title: "Line 2 CIP window moved to 02:00", body: "Mandatory · acknowledge before shift", category: "Announcements", read: false, to: "/announcements/ann-line2-cip" },
         { id: "n1", title: "Sign CIP SOP before shift", body: "Mandatory EHS · Line 2", category: "Company", read: false, to: "/knowledge" },
-        { id: "n2", title: "Leave balance reminder", body: `${p.leaveDays} days remaining`, category: "Service Requests", read: false, to: "/services/leave" },
-        { id: "n3", title: "Training: plant safety", body: `${p.training}% complete`, category: "Learning", read: false, to: "/learning" },
+        { id: "n2", title: "Your AMA question is shortlisted", body: "214 upvotes · answered live on 24 Sep", category: "Leadership", read: false, to: "/ceo-talks" },
+        { id: "n3", title: "Leave balance reminder", body: `${p.leaveDays} days remaining`, category: "Service Requests", read: false, to: "/services/leave" },
+        { id: "n4", title: "Training: plant safety", body: `${p.training}% complete`, category: "Learning", read: false, to: "/learning" },
       ],
     };
   }
@@ -172,9 +199,11 @@ function sliceFor(p: Persona): UserSlice {
       },
     ],
     notifications: [
+      { id: "n0", title: "Letter SLA drops to 24 hours on 25 Sep", body: "Announcement for Shared Services", category: "Announcements", read: false, to: "/announcements/ann-letters-sla" },
       { id: "n1", title: "3 tickets in the support queue", body: "Plant VPN, SAP access, payslip reprint", category: "Service Requests", read: false, to: "/workspace" },
-      { id: "n2", title: "Letter request SLA", body: "Employment letters pending HR stamp", category: "Service Requests", read: false, to: "/services/letters" },
-      { id: "n3", title: "Community huddle notes", body: "Bengaluru Plant posted safety notes", category: "Company", read: false, to: "/communities" },
+      { id: "n2", title: "The CEO answered your question", body: "Letter intake moves to the Hub in October", category: "Leadership", read: false, to: "/ceo-talks" },
+      { id: "n3", title: "Payroll cut-off 24 Sep, 6:00 PM", body: "Warn requesters before the window closes", category: "Announcements", read: false, to: "/announcements/ann-payroll-cutoff" },
+      { id: "n4", title: "Community huddle notes", body: "Bengaluru Plant posted safety notes", category: "Company", read: false, to: "/communities" },
     ],
   };
 }
@@ -189,6 +218,7 @@ const initial: State = {
   language: "English",
   approvals: initialApprovals,
   governance: {},
+  annPaused: {},
   users: emptyUsers(),
   toasts: [],
 };
@@ -216,7 +246,14 @@ type Action =
   | { type: "READ_NEWS"; id: string }
   | { type: "LETTER"; name: string }
   | { type: "GOV"; id: string; status: "Published" | "Archived" | "In review" }
-  | { type: "COURSE"; id: string; progress: number };
+  | { type: "COURSE"; id: string; progress: number }
+  | { type: "ACK_ANN"; id: string }
+  | { type: "DISMISS_ANN"; id: string }
+  | { type: "SEEN_ANN"; id: string }
+  | { type: "PAUSE_ANN"; id: string; paused: boolean }
+  | { type: "ASK_AMA"; question: AmaQuestion }
+  | { type: "UPVOTE_AMA"; id: string }
+  | { type: "REGISTER_AMA"; id: string };
 
 function patchUser(state: State, fn: (s: UserSlice) => UserSlice): State {
   const cur = state.users[state.userId] ?? sliceFor(getPersona(state.userId));
@@ -227,10 +264,14 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "HYDRATE": {
       if (!action.state?.users || !action.state.users[defaultPersona.id]) return initial;
+      const merged = Object.fromEntries(
+        personas.map((p) => [p.id, { ...sliceFor(p), ...(action.state.users?.[p.id] ?? {}) }])
+      );
       return {
         ...initial,
         ...action.state,
-        users: { ...emptyUsers(), ...action.state.users },
+        annPaused: action.state.annPaused ?? {},
+        users: merged,
         toasts: [],
         userId: action.state.userId && getPersona(action.state.userId).id === action.state.userId ? action.state.userId : defaultPersona.id,
       };
@@ -321,12 +362,47 @@ function reducer(state: State, action: Action): State {
       return { ...state, governance: { ...state.governance, [action.id]: action.status } };
     case "COURSE":
       return patchUser(state, (s) => ({ ...s, courses: { ...s.courses, [action.id]: action.progress } }));
+    case "ACK_ANN":
+      return patchUser(state, (s) => ({
+        ...s,
+        annAck: s.annAck.includes(action.id) ? s.annAck : [...s.annAck, action.id],
+        annSeen: s.annSeen.includes(action.id) ? s.annSeen : [...s.annSeen, action.id],
+      }));
+    case "DISMISS_ANN":
+      return patchUser(state, (s) => ({
+        ...s,
+        annDismissed: s.annDismissed.includes(action.id) ? s.annDismissed : [...s.annDismissed, action.id],
+        annSeen: s.annSeen.includes(action.id) ? s.annSeen : [...s.annSeen, action.id],
+      }));
+    case "SEEN_ANN":
+      return patchUser(state, (s) => ({
+        ...s,
+        annSeen: s.annSeen.includes(action.id) ? s.annSeen : [...s.annSeen, action.id],
+      }));
+    case "PAUSE_ANN":
+      return { ...state, annPaused: { ...state.annPaused, [action.id]: action.paused } };
+    case "ASK_AMA":
+      return patchUser(state, (s) => ({ ...s, amaAsked: [action.question, ...s.amaAsked] }));
+    case "UPVOTE_AMA":
+      return patchUser(state, (s) => ({
+        ...s,
+        amaUpvotes: s.amaUpvotes.includes(action.id)
+          ? s.amaUpvotes.filter((x) => x !== action.id)
+          : [...s.amaUpvotes, action.id],
+      }));
+    case "REGISTER_AMA":
+      return patchUser(state, (s) => ({
+        ...s,
+        amaRegistered: s.amaRegistered.includes(action.id)
+          ? s.amaRegistered.filter((x) => x !== action.id)
+          : [...s.amaRegistered, action.id],
+      }));
     default:
       return state;
   }
 }
 
-const KEY = "hccb-hub-v3";
+const KEY = "hccb-hub-v4";
 
 const Ctx = createContext<{
   state: State;
@@ -336,6 +412,14 @@ const Ctx = createContext<{
   unread: number;
   user: Persona;
   ready: boolean;
+  /** Live, targeted, not-yet-dismissed announcements for the signed-in user. */
+  myAnnouncements: Announcement[];
+  /** Highest-priority popup this user has not been served yet. */
+  popupAnnouncement: Announcement | null;
+  /** Mandatory notices still waiting on this user's acknowledgement. */
+  needsAck: Announcement[];
+  /** Every AMA question — seeded feed plus this user's own submissions. */
+  amaFeed: AmaQuestion[];
 } | null>(null);
 
 export function HubProvider({ children }: { children: ReactNode }) {
@@ -371,9 +455,40 @@ export function HubProvider({ children }: { children: ReactNode }) {
   const slice = state.users[state.userId] ?? sliceFor(user);
   const pendingCount = isManager(user) ? state.approvals.filter((a) => a.status === "Pending").length : 0;
   const unread = slice.notifications.filter((n) => !n.read).length;
+
+  const targeted = useMemo(
+    () => liveAnnouncementsFor(user, undefined, state.annPaused),
+    [user, state.annPaused]
+  );
+  const myAnnouncements = useMemo(
+    () => targeted.filter((a) => !slice.annDismissed.includes(a.id)),
+    [targeted, slice.annDismissed]
+  );
+  const popupAnnouncement = useMemo(
+    () => targeted.find((a) => a.popup && !slice.annSeen.includes(a.id)) ?? null,
+    [targeted, slice.annSeen]
+  );
+  const needsAck = useMemo(
+    () => targeted.filter((a) => a.acknowledge && !slice.annAck.includes(a.id)),
+    [targeted, slice.annAck]
+  );
+  const amaFeed = useMemo(() => [...slice.amaAsked, ...seedAmaQuestions], [slice.amaAsked]);
+
   const value = useMemo(
-    () => ({ state, slice, dispatch, pendingCount, unread, user, ready }),
-    [state, slice, pendingCount, unread, user, ready]
+    () => ({
+      state,
+      slice,
+      dispatch,
+      pendingCount,
+      unread,
+      user,
+      ready,
+      myAnnouncements,
+      popupAnnouncement,
+      needsAck,
+      amaFeed,
+    }),
+    [state, slice, pendingCount, unread, user, ready, myAnnouncements, popupAnnouncement, needsAck, amaFeed]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

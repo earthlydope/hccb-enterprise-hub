@@ -4,6 +4,8 @@ import { Icon, TopBar } from "../ui";
 import { newsItems } from "../data";
 import { isAdmin, isManager, isPlant, isSupport } from "../personas";
 import { useHub } from "../store";
+import { ImportantAnnouncements, PersonalAnnouncement } from "./Announcements";
+import { CeoTalksCard } from "./CeoTalks";
 
 export function Home() {
   const nav = useNavigate();
@@ -98,6 +100,8 @@ export function Home() {
             </button>
           )}
         </div>
+
+        <PersonalAnnouncement />
 
         {manager ? (
           <div className="card alert" style={{ marginTop: 14 }}>
@@ -199,6 +203,8 @@ export function Home() {
           </div>
         )}
 
+        <ImportantAnnouncements />
+
         <div className="section-title">
           <h3>Quick Actions</h3>
           <span className="tiny">{user.lane} shortcuts</span>
@@ -298,7 +304,7 @@ export function Home() {
             <p className="tiny">{hero.time}</p>
           </div>
         </button>
-        <div className="card townhall" style={{ marginTop: 10 }}>
+        <button className="card townhall" style={{ marginTop: 10, width: "100%", textAlign: "left" }} onClick={() => nav("/ceo-talks")}>
           <div className="cal">
             <span>Thu</span>
             <b>24</b>
@@ -306,12 +312,14 @@ export function Home() {
           <div style={{ flex: 1 }}>
             <div className="tiny">Upcoming Townhall</div>
             <b>Executive Leadership Quarterly Address</b>
-            <div className="tiny">3:00 PM IST · Teams Live</div>
+            <div className="tiny">3:00 PM IST · Teams Live · questions open</div>
           </div>
-          <button className="icon-round" onClick={() => nav("/news")} aria-label="Calendar">
+          <span className="icon-round" aria-hidden>
             <Icon name="calendar_today" size={18} />
-          </button>
-        </div>
+          </span>
+        </button>
+
+        <CeoTalksCard />
 
         <div className="section-title">
           <h3>Recognition & Kudos</h3>

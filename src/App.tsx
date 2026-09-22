@@ -17,6 +17,8 @@ import {
 } from "./screens/Services";
 import { Knowledge, KnowledgeDetail } from "./screens/Knowledge";
 import { Search } from "./screens/Search";
+import { AnnouncementDetail, AnnouncementPopup, Announcements } from "./screens/Announcements";
+import { CeoTalks } from "./screens/CeoTalks";
 import { Copilot } from "./screens/Copilot";
 import {
   Admin,
@@ -64,6 +66,9 @@ function Shell() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/apps" element={<Apps />} />
         <Route path="/apps/:id" element={<AppLaunch />} />
+        <Route path="/announcements" element={<Announcements />} />
+        <Route path="/announcements/:id" element={<AnnouncementDetail />} />
+        <Route path="/ceo-talks" element={<CeoTalks />} />
         <Route path="/news" element={<News />} />
         <Route path="/news/:id" element={<NewsDetail />} />
         <Route path="/learning" element={<Learning />} />
@@ -76,6 +81,7 @@ function Shell() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {!hideTabs && <TabBar />}
+      <AnnouncementPopup />
       <Toasts />
     </div>
   );

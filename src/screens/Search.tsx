@@ -1,15 +1,25 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Icon, ScreenHeader } from "../ui";
-import { apps, knowledgeDocs, newsItems, copilotAnswer } from "../data";
+import {
+  amaQuestions,
+  apps,
+  ceo,
+  copilotAnswer,
+  formatDay,
+  knowledgeDocs,
+  liveAnnouncementsFor,
+  localisedAnnouncement,
+  newsItems,
+} from "../data";
 import { personas } from "../personas";
 import { useHub } from "../store";
 
-const filters = ["All", "Policies & SOPs", "News", "People", "Applications", "Learning"];
+const filters = ["All", "Announcements", "CEO Talks", "Policies & SOPs", "News", "People", "Applications", "Learning"];
 
 export function Search() {
   const [params] = useSearchParams();
-  const { slice, dispatch, user, pendingCount } = useHub();
+  const { slice, dispatch, user, pendingCount, state } = useHub();
   const nav = useNavigate();
   const [q, setQ] = useState(params.get("q") ?? "");
   const [facet, setFacet] = useState("All");
@@ -17,6 +27,26 @@ export function Search() {
 
   const results = useMemo(() => {
     if (!query) return [];
+    const notices = liveAnnouncementsFor(user, undefined, state.annPaused)
+      .filter((a) => `${a.title} ${a.body} ${a.detail.join(" ")} ${a.owner}`.toLowerCase().includes(query))
+      .map((a) => ({
+        kind: "Announcements",
+        title: localisedAnnouncement(a, state.language).title,
+        snippet: localisedAnnouncement(a, state.language).body,
+        source: a.owner,
+        updated: `Expires ${formatDay(a.expiresAt)}`,
+        to: `/announcements/${a.id}`,
+      }));
+    const ama = amaQuestions
+      .filter((q) => `${q.text} ${q.answer ?? ""} ${q.topic}`.toLowerCase().includes(query) || query.includes("ceo"))
+      .map((q) => ({
+        kind: "CEO Talks",
+        title: q.text,
+        snippet: q.answer ? `${ceo.name}: ${q.answer}` : `${q.upvotes} upvotes · ${q.status}`,
+        source: "Ask Me Anything",
+        updated: q.answeredAt ?? "Open",
+        to: "/ceo-talks",
+      }));
     const docs = knowledgeDocs
       .filter((d) => `${d.title} ${d.snippet} ${d.body.join(" ")}`.toLowerCase().includes(query))
       .map((d) => ({
@@ -69,9 +99,9 @@ export function Search() {
           },
         ]
       : [];
-    const all = [...docs, ...news, ...people, ...applications, ...learning];
+    const all = [...notices, ...ama, ...docs, ...news, ...people, ...applications, ...learning];
     return facet === "All" ? all : all.filter((r) => r.kind === facet);
-  }, [query, facet]);
+  }, [query, facet, user, state.annPaused, state.language]);
 
   const overview = query ? copilotAnswer(query, user, pendingCount) : null;
 

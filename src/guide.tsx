@@ -47,6 +47,27 @@ function hintFor(
       title: "Knowledge",
       body: plant ? "Plant Safety SOP is pinned for 1-tap sign-off." : "Policies and SOPs. Bookmark or ask Copilot.",
     },
+    "home-personal": {
+      title: "Personalised announcements",
+      body: `Generated from ${user.firstName}\u2019s lane, ${user.department} and ${user.location} \u2014 the chips show why each card was targeted.`,
+    },
+    "home-ann-all": { title: "Announcement centre", body: "Every live notice for this user, plus the expired archive." },
+    "home-ann-row": {
+      title: "Important announcement",
+      body: "Priority, owner and expiry come from the targeting rules. Critical notices carry an acknowledgement.",
+    },
+    "home-ann-ack": { title: "Acknowledge", body: "Records this employee against the mandatory notice and clears the Home warning." },
+    "popup-ack": { title: "Mandatory popup", body: "Scheduled, targeted, and served once per employee until acknowledged." },
+    "ann-ack": { title: "Acknowledge notice", body: "Stored on this user \u2014 switch persona in Profile to see it reset." },
+    "home-ceo": {
+      title: "CEO Talks",
+      body: "Ask Me Anything for the 24 Sep townhall. Questions can be anonymous; the top-voted ones are answered live.",
+    },
+    "home-ceo-ask": { title: "Ask the CEO", body: "Posts straight from Home into the AMA queue under this user\u2019s name." },
+    "ceo-register": { title: "Register", body: "Adds the AMA to this user\u2019s calendar, or opens the replay for past sessions." },
+    "ceo-vote": { title: "Upvote", body: "Reorders the Top tab. Most upvoted questions get answered live." },
+    "ceo-submit": { title: "Send question", body: "Topic + anonymity are stored per user and land in My questions." },
+    "admin-ann-pause": { title: "Pause / publish", body: "Content manager control \u2014 pausing pulls the notice from every targeted Home." },
     "home-admin": { title: "Admin Console", body: admin ? "Governance: confirm, archive, send for approval." : "Restricted to the corporate admin persona." },
     "home-review": {
       title: "Approval queue",

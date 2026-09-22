@@ -1,7 +1,20 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icon, ScreenHeader, TopBar } from "../ui";
-import { analyticsCards, apps, communities, governanceItems, learningCourses, newsItems, recognitionFeed } from "../data";
+import {
+  analyticsCards,
+  announcementWindow,
+  announcements,
+  apps,
+  audienceLabel,
+  communities,
+  DEMO_NOW,
+  formatDay,
+  governanceItems,
+  learningCourses,
+  newsItems,
+  recognitionFeed,
+} from "../data";
 import { toast, useHub } from "../store";
 import { personas } from "../personas";
 
@@ -55,6 +68,20 @@ export function Profile() {
         <div className="section-title">
           <h3>More</h3>
         </div>
+        <button className="list-item" onClick={() => nav("/announcements")}>
+          <Icon name="campaign" />
+          <div>
+            <h4>Announcements</h4>
+            <div className="tiny">Targeted notices and acknowledgements</div>
+          </div>
+        </button>
+        <button className="list-item" onClick={() => nav("/ceo-talks")}>
+          <Icon name="record_voice_over" />
+          <div>
+            <h4>CEO Talks</h4>
+            <div className="tiny">Ask Me Anything · 24 Sep</div>
+          </div>
+        </button>
         <button className="list-item" onClick={() => nav("/communities")}>
           <Icon name="groups" />
           <div>
@@ -119,7 +146,7 @@ export function Notifications() {
   const { slice, dispatch } = useHub();
   const nav = useNavigate();
   const [cat, setCat] = useState("All");
-  const cats = ["All", "Approvals", "Company", "Learning", "Recognition", "Service Requests"];
+  const cats = ["All", "Announcements", "Leadership", "Approvals", "Company", "Learning", "Service Requests"];
   const items = slice.notifications.filter((n) => cat === "All" || n.category === cat);
   return (
     <>
@@ -267,6 +294,20 @@ export function News() {
             </div>
           </button>
         ))}
+        <button className="list-item" onClick={() => nav("/ceo-talks")}>
+          <Icon name="record_voice_over" />
+          <div>
+            <h4>CEO Talks · Ask Me Anything</h4>
+            <div className="tiny">Leadership Corner · questions open until 24 Sep</div>
+          </div>
+        </button>
+        <button className="list-item" onClick={() => nav("/announcements")}>
+          <Icon name="campaign" />
+          <div>
+            <h4>Announcement Centre</h4>
+            <div className="tiny">Notices targeted to you</div>
+          </div>
+        </button>
         <button className="list-item" onClick={() => nav("/recognition")}>
           <Icon name="emoji_events" />
           <div>
@@ -441,6 +482,7 @@ export function Analytics() {
 
 export function Admin() {
   const { state, dispatch, user } = useHub();
+  const nav = useNavigate();
   if (!user.roles.includes("admin")) {
     return (
       <>
@@ -458,6 +500,55 @@ export function Admin() {
     <>
       <ScreenHeader title="Admin Console" />
       <div className="scroll">
+        <div className="section-title" style={{ marginTop: 4 }}>
+          <h3>Announcements & popups</h3>
+          <button className="link" onClick={() => nav("/announcements")}>
+            Preview
+          </button>
+        </div>
+        <p className="tiny" style={{ margin: "0 4px 10px" }}>
+          Scheduling, audience targeting and popup control. Pausing hides a notice for every targeted employee.
+        </p>
+        {announcements.map((a) => {
+          const win = announcementWindow(a, DEMO_NOW);
+          const paused = state.annPaused[a.id] === true;
+          return (
+            <div key={a.id} className="card" style={{ marginBottom: 10 }}>
+              <div className="ann-meta">
+                <span className={`tag ${a.priority === "Critical" ? "crit" : a.priority === "High" ? "high" : ""}`}>
+                  {a.priority}
+                </span>
+                <span className="tag">{a.kind}</span>
+                <span className={`tag ${paused ? "" : win === "Live" ? "done" : ""}`}>{paused ? "Paused" : win}</span>
+                {a.popup && <span className="tag dark">Popup</span>}
+                {a.acknowledge && <span className="tag dark">Ack required</span>}
+              </div>
+              <h4 style={{ margin: "8px 0 4px", fontSize: 15, letterSpacing: "-0.018em" }}>{a.title}</h4>
+              <p className="tiny" style={{ margin: 0 }}>
+                {a.owner} · {formatDay(a.publishedAt)} → {formatDay(a.expiresAt)}
+              </p>
+              <p className="tiny" style={{ margin: "2px 0 0" }}>Audience: {audienceLabel(a.audience)}</p>
+              <div className="ann-actions">
+                <button
+                  className={paused ? "mini solid" : "mini"}
+                  data-hint="admin-ann-pause"
+                  onClick={() => {
+                    dispatch({ type: "PAUSE_ANN", id: a.id, paused: !paused });
+                    toast(dispatch, paused ? `${a.kind} published` : `${a.kind} paused`);
+                  }}
+                >
+                  {paused ? "Publish" : "Pause"}
+                </button>
+                <button className="mini" onClick={() => nav(`/announcements/${a.id}`)}>
+                  Open
+                </button>
+              </div>
+            </div>
+          );
+        })}
+        <div className="section-title">
+          <h3>Content governance</h3>
+        </div>
         <p className="muted">Content governance · 3-month review cadence · audit trail</p>
         {governanceItems.map((g) => {
           const status = state.governance[g.id] ?? (g.health === "Overdue" ? "In review" : "Published");
