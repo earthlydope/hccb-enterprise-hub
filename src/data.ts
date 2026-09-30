@@ -397,15 +397,47 @@ export const analyticsCards = [
 ];
 
 import type { Persona } from "./personas";
-import { isManager } from "./personas";
+import { isHR, isManager } from "./personas";
+import { peopleView } from "./hr";
+import { needsAttention, rankedHeat } from "./heat";
 
 export function copilotAnswer(query: string, user?: Persona, pending = 0) {
   const q = query.toLowerCase();
   const days = user?.leaveDays ?? 12;
+  if (["attrition", "headcount", "flight risk", "compliance", "enps", "absenteeism", "people analytics", "hiring"].some((k) => q.includes(k))) {
+    if (!user || !isHR(user)) {
+      return {
+        answer:
+          "Workforce analytics is available to the HR analytics team. I can help with your own leave balance, training status and requests.",
+        sources: [],
+        actions: [{ label: "Open My Workspace", to: "/workspace" }],
+      };
+    }
+    const v = peopleView({ dept: "all", zone: "all", period: "12M" });
+    const worst = [...v.deptRows].sort((a, b) => b.attrition - a.attrition)[0];
+    return {
+      answer: `Headcount is ${v.headcount.toLocaleString("en-IN")} with annualised attrition at ${v.attrition}% (${v.voluntary}% voluntary). ${worst.name} is highest at ${worst.attrition}%. Mandatory training compliance is ${v.training}%, with ${v.overdue.toLocaleString("en-IN")} people overdue, and ${v.flightRisk} employees show two or more flight-risk signals.`,
+      sources: [],
+      actions: [
+        { label: "Open people analytics", to: "/people" },
+        { label: "See engagement heat", to: "/heat" },
+      ],
+    };
+  }
+  if (q.includes("heat") || q.includes("trending") || q.includes("hot topic") || q.includes("viral")) {
+    const top = rankedHeat().slice(0, 3);
+    return {
+      answer: user && isHR(user)
+        ? `The three hottest conversations right now: ${top.map((t) => `“${t.title}” (heat ${t.heat})`).join(", ")}. Two need a response before the townhall.`
+        : "Engagement analytics is available to the HR analytics team.",
+      sources: [],
+      actions: [{ label: user && isHR(user) ? "Open engagement heat" : "Open announcements", to: user && isHR(user) ? "/heat" : "/announcements" }],
+    };
+  }
   if (q.includes("ceo") || q.includes("ama") || q.includes("ask me anything") || q.includes("townhall") || q.includes("town hall")) {
     return {
       answer:
-        "CEO Talks — Ask Me Anything runs on 24 Sep at 3:00 PM IST on Teams Live. Questions are open now: the most upvoted ones are answered live, the rest get a written reply within a week. You can ask anonymously.",
+        "CEO Talks — Ask Me Anything with Hemant Rupani, CEO since 8 September 2025, runs on 24 Sep at 3:00 PM IST on Teams Live. Questions are open now: the most upvoted ones are answered live, the rest get a written reply within a week. You can ask anonymously.",
       sources: [],
       actions: [
         { label: "Ask the CEO", to: "/ceo-talks" },
@@ -670,7 +702,7 @@ export const announcements: Announcement[] = [
     priority: "High",
     title: "Leadership Quarterly Townhall · 24 Sep, 3:00 PM IST",
     body:
-      "Rajesh Menon opens with the Q3 scorecard, then takes live questions from every plant and office on Teams Live.",
+      "Hemant Rupani opens with the Q3 scorecard, then takes live questions from every plant and office on Teams Live.",
     detail: ["Teams Live · all locations", "Regional language captions available", "Replay posted within 24 hours"],
     owner: "Internal Communications",
     publishedAt: "2026-09-18",
@@ -683,12 +715,12 @@ export const announcements: Announcement[] = [
       "हिन्दी": {
         title: "लीडरशिप त्रैमासिक टाउनहॉल · 24 सितंबर, दोपहर 3:00 बजे IST",
         body:
-          "राजेश मेनन Q3 स्कोरकार्ड से शुरुआत करेंगे, फिर Teams Live पर हर प्लांट और ऑफिस से लाइव सवाल लेंगे।",
+          "हेमंत रुपानी Q3 स्कोरकार्ड से शुरुआत करेंगे, फिर Teams Live पर हर प्लांट और ऑफिस से लाइव सवाल लेंगे।",
       },
       "ಕನ್ನಡ": {
         title: "ನಾಯಕತ್ವ ತ್ರೈಮಾಸಿಕ ಟೌನ್‌ಹಾಲ್ · ಸೆ. 24, ಮಧ್ಯಾಹ್ನ 3:00 IST",
         body:
-          "ರಾಜೇಶ್ ಮೆನನ್ Q3 ಸ್ಕೋರ್‌ಕಾರ್ಡ್‌ನಿಂದ ಆರಂಭಿಸಿ, ನಂತರ Teams Live ನಲ್ಲಿ ಪ್ರತಿ ಘಟಕ ಮತ್ತು ಕಚೇರಿಯಿಂದ ನೇರ ಪ್ರಶ್ನೆಗಳನ್ನು ಸ್ವೀಕರಿಸುತ್ತಾರೆ.",
+          "ಹೇಮಂತ್ ರೂಪಾನಿ Q3 ಸ್ಕೋರ್‌ಕಾರ್ಡ್‌ನಿಂದ ಆರಂಭಿಸಿ, ನಂತರ Teams Live ನಲ್ಲಿ ಪ್ರತಿ ಘಟಕ ಮತ್ತು ಕಚೇರಿಯಿಂದ ನೇರ ಪ್ರಶ್ನೆಗಳನ್ನು ಸ್ವೀಕರಿಸುತ್ತಾರೆ.",
       },
     },
   },
@@ -853,11 +885,35 @@ export function formatDay(value: string) {
  * Proposed features: leadership announcements & community engagement.
  * ------------------------------------------------------------------ */
 
+/**
+ * Verified from HCCB's own announcement:
+ * https://www.hccb.in/media/hccb-names-new-CEO (announced 15 Jul 2025).
+ * No approved headshot is bundled, so the UI renders a monogram.
+ */
 export const ceo = {
-  name: "Rajesh Menon",
+  name: "Hemant Rupani",
   title: "Chief Executive Officer · HCCB",
-  avatar: "/people/rajesh.jpg",
+  initials: "HR",
+  since: "8 Sep 2025",
+  announced: "15 Jul 2025",
+  succeeded: "Juan Pablo Rodriguez",
+  career: [
+    { org: "Mondelez International", years: "2016–2025", role: "Director of Sales, India · VP & MD, Vietnam · Business Unit President, Southeast Asia" },
+    { org: "Britannia Industries", years: "2014–2016", role: "Vice President, Sales and Business Head, Breads" },
+    { org: "Vodafone", years: "2010–2014", role: "Roles of increasing responsibility" },
+    { org: "PepsiCo", years: "1999–2002 · 2004–2010", role: "Including Senior Vice President, Customer Marketing, India Beverages" },
+    { org: "Infosys Technologies", years: "2002–2004", role: "" },
+    { org: "ICI India", years: "1997–1999", role: "Began his career" },
+  ],
+  education: [
+    "B.E. Mechanical Engineering — Regional Engineering College, Jaipur",
+    "MBA, Marketing — Faculty of Management Studies, University of Delhi",
+  ],
+  source: "https://www.hccb.in/media/hccb-names-new-CEO",
 };
+
+/** Seeded AMA answers are sample content, not statements by the CEO. */
+export const AMA_ANSWER_BY = "Office of the CEO";
 
 export type AmaSession = {
   id: string;
@@ -950,8 +1006,8 @@ export const amaQuestions: AmaQuestion[] = [
     upvotes: 156,
     status: "Answered",
     answer:
-      "Fair challenge. From October the letter desk in this Hub becomes the only intake — HR mailboxes will auto-reply with the link. Shared Services keeps the exception queue for anything the templates cannot cover.",
-    answeredAt: "Answered in writing · 20 Sep",
+      "From October, the letter desk in this Hub becomes the single intake. HR mailboxes will auto-reply with the link, and Shared Services keeps an exception queue for requests the templates cannot cover.",
+    answeredAt: "Illustrative answer · 20 Sep",
   },
   {
     id: "q4",
@@ -997,8 +1053,8 @@ export const amaQuestions: AmaQuestion[] = [
     upvotes: 204,
     status: "Answered",
     answer:
-      "Yes, but gradually. The new line adds capacity from Q1 next year, and we will re-cut the South depot map only after two clean quarters of run rate. No depot closures are planned.",
-    answeredAt: "Answered live · 25 Jun",
+      "Capacity from the new line comes online gradually, and the South depot map is reviewed only after two quarters of stable run rate. No depot closures are planned.",
+    answeredAt: "Illustrative answer · 25 Jun",
   },
   {
     id: "q8",
@@ -1011,8 +1067,8 @@ export const amaQuestions: AmaQuestion[] = [
     upvotes: 178,
     status: "Answered",
     answer:
-      "Because I would rather do it once, properly. The review now covers shift, travel and plant allowances together, and the outcome lands with the October cycle — not another deferral.",
-    answeredAt: "Answered live · 25 Jun",
+      "The review was widened to cover shift, travel and plant allowances together, so it is done once. The outcome lands with the October cycle.",
+    answeredAt: "Illustrative answer · 25 Jun",
   },
   {
     id: "q9",
@@ -1025,8 +1081,8 @@ export const amaQuestions: AmaQuestion[] = [
     upvotes: 88,
     status: "Answered",
     answer:
-      "It is a company metric. Depots contribute through recharge projects in their catchment; those are now part of the regional scorecard, not a side project.",
-    answeredAt: "Answered in writing · 02 Jul",
+      "It is a company metric. Depots contribute through recharge projects in their catchment, and those now sit on the regional scorecard.",
+    answeredAt: "Illustrative answer · 02 Jul",
   },
 ];
 
@@ -1054,6 +1110,47 @@ export function personalFeed(
   ctx: { pending: number; openTickets: number; leaveDays: number; training: number }
 ): PersonalCard[] {
   const who = [p.location, p.department];
+  if (p.lane === "HR") {
+    const v = peopleView({ dept: "all", zone: "all", period: "12M" });
+    const hot = rankedHeat();
+    const urgent = hot.filter(needsAttention);
+    const lead = urgent[0] ?? hot[0];
+    const east = v.zoneRows.find((z) => z.zone === "East")!;
+    const south = v.zoneRows.find((z) => z.zone === "South")!;
+    const worst = [...v.deptRows].sort((a, b) => b.attrition - a.attrition)[0];
+    return [
+      {
+        id: "pf-heat",
+        eyebrow: `For you · ${p.firstName}`,
+        title: `${urgent.length} conversations need a response before the townhall`,
+        body: `“${lead.title}” is up ${lead.velocity}% in a day, with ${lead.sentiment.neg}% negative sentiment.`,
+        reasons: [p.department, "Engagement owner"],
+        cta: { label: "Open engagement heat", to: "/heat" },
+        tone: "brand",
+        stat: { label: "Heating up", value: String(hot.filter((h) => h.state === "Heating up").length) },
+      },
+      {
+        id: "pf-train",
+        eyebrow: "For you · Compliance",
+        title: `East is ${south.training - east.training} points behind South on mandatory training`,
+        body: `${east.training}% against ${south.training}%. Site-based roles carry most of the backlog.`,
+        reasons: ["People analytics", "East zone"],
+        cta: { label: "Open people analytics", to: "/people" },
+        tone: "plain",
+        stat: { label: "Overdue", value: v.overdue.toLocaleString("en-IN") },
+      },
+      {
+        id: "pf-attr",
+        eyebrow: "For you · Retention",
+        title: `${worst.name} attrition is running at ${worst.attrition}%`,
+        body: `${worst.flightRisk} people there show two or more flight-risk signals. No role change in three years is the most common.`,
+        reasons: [worst.name, "Flight risk"],
+        cta: { label: "See the drivers", to: "/people" },
+        tone: "plain",
+        stat: { label: "At risk", value: String(worst.flightRisk) },
+      },
+    ];
+  }
   if (p.lane === "Plant") {
     return [
       {

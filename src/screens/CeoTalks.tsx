@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Icon, ScreenHeader } from "../ui";
-import { amaSessions, amaTopics, ceo, type AmaQuestion } from "../data";
+import { Icon, ScreenHeader, Monogram } from "../ui";
+import { amaSessions, amaTopics, ceo, AMA_ANSWER_BY, type AmaQuestion } from "../data";
 import { toast, useHub } from "../store";
 
 function upvoteCount(q: AmaQuestion, upvoted: boolean) {
@@ -60,7 +60,7 @@ export function CeoTalksCard() {
       </div>
       <div className="ceo-card">
         <div className="ceo-head">
-          <img src={ceo.avatar} alt={ceo.name} />
+          <Monogram initials={ceo.initials} size={48} />
           <div>
             <b>{ceo.name}</b>
             <small>{ceo.title}</small>
@@ -180,7 +180,7 @@ export function CeoTalks() {
 
         <div className="ceo-card">
           <div className="ceo-head">
-            <img src={ceo.avatar} alt={ceo.name} />
+            <Monogram initials={ceo.initials} size={48} />
             <div>
               <b>{ceo.name}</b>
               <small>{ceo.title}</small>
@@ -256,7 +256,13 @@ export function CeoTalks() {
           </div>
         )}
 
-        <div className="filters" style={{ marginTop: 14 }}>
+        <div className="card" style={{ marginTop: 12 }} data-hint="ceo-profile">
+          <CeoProfile compact />
+        </div>
+
+        <IllustrativeNote />
+
+        <div className="filters" style={{ marginTop: 6 }}>
           {tabs.map((t) => (
             <button key={t} className={tab === t ? "filter on" : "filter"} onClick={() => setTab(t)}>
               {t}
@@ -296,7 +302,7 @@ export function CeoTalks() {
                 {q.answer && (
                   <div className="ama-answer">
                     <b>
-                      <img src={ceo.avatar} alt="" /> {ceo.name} · {q.answeredAt}
+                      <Icon name="verified" size={14} /> {AMA_ANSWER_BY} · {q.answeredAt}
                     </b>
                     {q.answer}
                   </div>
@@ -307,5 +313,65 @@ export function CeoTalks() {
         })}
       </div>
     </>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Leadership profile — verified facts only, sourced to HCCB's release.
+ * ------------------------------------------------------------------ */
+export function CeoProfile({ compact }: { compact?: boolean }) {
+  return (
+    <div className="ceo-profile">
+      <div className="cp-head">
+        <Monogram initials={ceo.initials} size={compact ? 44 : 52} />
+        <div>
+          <b>{ceo.name}</b>
+          <small>
+            {ceo.title} · since {ceo.since}
+          </small>
+        </div>
+      </div>
+      <p className="tiny" style={{ margin: 0, lineHeight: 1.45 }}>
+        Appointed CEO of Hindustan Coca-Cola Beverages, effective {ceo.since}, succeeding {ceo.succeeded}.
+      </p>
+      <div className="ceo-career">
+        {(compact ? ceo.career.slice(0, 3) : ceo.career).map((c) => (
+          <div key={c.org}>
+            <span>{c.years}</span>
+            <p>
+              <b>{c.org}</b>
+              {c.role ? ` — ${c.role}` : ""}
+            </p>
+          </div>
+        ))}
+      </div>
+      {!compact && (
+        <div className="ceo-career">
+          {ceo.education.map((e) => (
+            <div key={e}>
+              <span>Education</span>
+              <p>{e}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      <span className="ceo-source">
+        Source:{" "}
+        <a href={ceo.source} target="_blank" rel="noopener noreferrer">
+          HCCB announcement, {ceo.announced}
+        </a>
+      </span>
+    </div>
+  );
+}
+
+export function IllustrativeNote() {
+  return (
+    <div className="illus-note">
+      <Icon name="info" size={16} />
+      <span>
+        Sample questions and answers for this prototype. They are not statements by {ceo.name}.
+      </span>
+    </div>
   );
 }

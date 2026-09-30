@@ -1,4 +1,4 @@
-export type Role = "manager" | "plant" | "support" | "admin";
+export type Role = "manager" | "plant" | "support" | "admin" | "hr";
 
 export type Persona = {
   id: string;
@@ -20,10 +20,32 @@ export type Persona = {
   blurb: string;
   homeFocus: string;
   nets: string;
-  lane: "Corporate" | "Plant" | "Support";
+  lane: "Corporate" | "Plant" | "Support" | "HR";
 };
 
 export const personas: Persona[] = [
+  {
+    id: "ananya",
+    firstName: "Ananya",
+    lastName: "Krishnan",
+    fullName: "Ananya Krishnan",
+    empId: "HCCB-27405",
+    email: "ananya.krishnan@hccb.co.in",
+    roleTitle: "HR Analytics Manager · People Insights",
+    department: "Human Resources",
+    location: "Bengaluru HQ · Enabling office",
+    manager: "Office of the CHRO",
+    avatar: "/people/sunita.jpg",
+    status: "Active",
+    roles: ["hr"],
+    leaveDays: 14,
+    training: 91,
+    openReq: 0,
+    blurb: "People analytics, engagement heat, communications reach",
+    homeFocus: "Workforce health, training compliance and what employees are responding to",
+    nets: "₹1,36,900",
+    lane: "HR",
+  },
   {
     id: "avinash",
     firstName: "Avinash",
@@ -116,4 +138,9 @@ export function isSupport(p: Persona) {
 
 export function isAdmin(p: Persona) {
   return hasRole(p, "admin");
+}
+
+/** Full analytics — people, engagement heat, communications reach — is HR-only. */
+export function isHR(p: Persona) {
+  return hasRole(p, "hr");
 }

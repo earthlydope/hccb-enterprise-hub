@@ -6,7 +6,7 @@ import { toast, useHub } from "../store";
 /** Desktop sign-in. Same three demo personas as the mobile app. */
 export function WebLogin() {
   const { dispatch } = useHub();
-  const [pick, setPick] = useState("avinash");
+  const [pick, setPick] = useState("ananya");
   const selected = personas.find((p) => p.id === pick) ?? personas[0];
 
   return (

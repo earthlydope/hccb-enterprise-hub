@@ -120,6 +120,21 @@ function sliceFor(p: Persona): UserSlice {
     amaRegistered: [],
   };
 
+  if (p.id === "ananya") {
+    return {
+      ...base,
+      favApps: ["hr", "pbi", "lms"],
+      searchHistory: ["Attrition by department", "Training compliance East"],
+      notifications: [
+        { id: "n0", title: "2 conversations need a response", body: "Night-shift CIP crews · field allowances", category: "Insights", read: false, to: "/heat" },
+        { id: "n1", title: "IPO thread is heating up", body: "Employee shares question · heat 79", category: "Insights", read: false, to: "/heat" },
+        { id: "n2", title: "Monthly people report is ready", body: "Attrition, compliance and hiring for September", category: "Insights", read: false, to: "/people" },
+        { id: "n3", title: "Festive safety stand-down", body: "Mandatory · acknowledge by 25 Sep", category: "Announcements", read: false, to: "/announcements/ann-festive-safety" },
+        { id: "n4", title: "CEO Talks · questions open", body: "September AMA on 24 Sep, 3:00 PM IST", category: "Leadership", read: false, to: "/leadership" },
+      ],
+    };
+  }
+
   if (p.id === "avinash") {
     return {
       ...base,
@@ -411,7 +426,7 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-const KEY = "hccb-hub-v4";
+const KEY = "hccb-hub-v5";
 
 const Ctx = createContext<{
   state: State;

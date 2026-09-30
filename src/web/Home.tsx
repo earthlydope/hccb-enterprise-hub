@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Icon } from "../ui";
+import { Icon, Monogram } from "../ui";
 import { toast, useHub } from "../store";
-import { isManager, isPlant, isSupport } from "../personas";
+import { isHR, isManager, isPlant, isSupport } from "../personas";
 import {
   amaSessions,
   apps,
@@ -12,7 +12,8 @@ import {
   newsItems,
   personalFeed,
 } from "../data";
-import { headlineCards } from "../analytics";
+import { peopleView } from "../hr";
+import { heatTotals, rankedHeat } from "../heat";
 
 const kindLook: Record<string, { icon: string; bg: string; color: string }> = {
   Mandatory: { icon: "priority_high", bg: "#fef2f2", color: "#f40009" },
@@ -34,6 +35,10 @@ export function WebHome() {
   const plant = isPlant(user);
   const support = isSupport(user);
   const openTickets = slice.tickets.filter((t) => t.status !== "Resolved").length;
+  const hr = isHR(user);
+  const people = hr ? peopleView({ dept: "all", zone: "all", period: "12M" }) : null;
+  const heat = hr ? rankedHeat().slice(0, 3) : [];
+  const heatNow = hr ? heatTotals() : null;
 
   const cards = personalFeed(user, {
     pending: pendingCount,
@@ -74,20 +79,37 @@ export function WebHome() {
             <span>{user.roleTitle}</span>
           </div>
         </div>
-        <div className="wa-hero-stats">
-          <button className="wa-hero-stat" data-hint="w-hero-stat" onClick={() => nav("/workspace")}>
-            <b>{manager ? pendingCount : support ? openTickets : user.leaveDays}</b>
-            <span>{manager ? "Pending approvals" : support ? "Open tickets" : "Leave days"}</span>
-          </button>
-          <button className="wa-hero-stat" onClick={() => nav("/learning")}>
-            <b>{user.training}%</b>
-            <span>Training complete</span>
-          </button>
-          <button className="wa-hero-stat" onClick={() => nav("/announcements")}>
-            <b>{myAnnouncements.length}</b>
-            <span>Announcements for you</span>
-          </button>
-        </div>
+        {hr && people && heatNow ? (
+          <div className="wa-hero-stats">
+            <button className="wa-hero-stat" data-hint="w-hero-stat" onClick={() => nav("/people")}>
+              <b>{people.headcount.toLocaleString("en-IN")}</b>
+              <span>Headcount</span>
+            </button>
+            <button className="wa-hero-stat" onClick={() => nav("/people")}>
+              <b>{people.attrition}%</b>
+              <span>Attrition, annualised</span>
+            </button>
+            <button className="wa-hero-stat" onClick={() => nav("/heat")}>
+              <b>{heatNow.heating}</b>
+              <span>Conversations heating up</span>
+            </button>
+          </div>
+        ) : (
+          <div className="wa-hero-stats">
+            <button className="wa-hero-stat" data-hint="w-hero-stat" onClick={() => nav("/workspace")}>
+              <b>{manager ? pendingCount : support ? openTickets : user.leaveDays}</b>
+              <span>{manager ? "Pending approvals" : support ? "Open tickets" : "Leave days"}</span>
+            </button>
+            <button className="wa-hero-stat" onClick={() => nav("/learning")}>
+              <b>{user.training}%</b>
+              <span>Training complete</span>
+            </button>
+            <button className="wa-hero-stat" onClick={() => nav("/announcements")}>
+              <b>{myAnnouncements.length}</b>
+              <span>Announcements for you</span>
+            </button>
+          </div>
+        )}
       </section>
 
       {/* ---------- One-click actions ---------- */}
@@ -284,7 +306,7 @@ export function WebHome() {
           {/* ---- CEO Talks ---- */}
           <section className="wa-ceo" data-hint="w-ceo">
             <div className="wa-ceo-head">
-              <img src={ceo.avatar} alt={ceo.name} />
+              <Monogram initials={ceo.initials} size={48} />
               <div>
                 <b>{ceo.name}</b>
                 <small>{ceo.title}</small>
@@ -408,25 +430,69 @@ export function WebHome() {
           </section>
 
           {/* ---- My dashboard ---- */}
-          <section className="wa-card" data-hint="w-dash">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          {hr && people && heatNow ? (
+            <section className="wa-card" data-hint="w-dash">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <h3>People pulse</h3>
+                <button className="wa-link-btn" onClick={() => nav("/people")}>
+                  People analytics
+                </button>
+              </div>
+              <p className="wa-sub" style={{ marginBottom: 12 }}>Company-wide · last 12 months</p>
+              <div className="wa-grid wa-g2" style={{ gap: 10 }}>
+                {[
+                  { v: `${people.training}%`, l: "Training compliance" },
+                  { v: people.eNPS > 0 ? `+${people.eNPS}` : `${people.eNPS}`, l: "eNPS" },
+                  { v: String(people.flightRisk), l: "High flight risk" },
+                  { v: String(people.openRoles), l: "Open roles" },
+                ].map((c) => (
+                  <div key={c.l} style={{ background: "rgba(17,17,20,0.035)", borderRadius: 11, padding: "10px 12px" }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>{c.v}</div>
+                    <div style={{ fontSize: 11.5, color: "var(--w-muted)", fontWeight: 600 }}>{c.l}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 16 }}>
+                <h3 style={{ fontSize: 14 }}>Heating up</h3>
+                <button className="wa-link-btn" onClick={() => nav("/heat")}>
+                  Engagement heat
+                </button>
+              </div>
+              <div className="wa-list">
+                {heat.map((h) => (
+                  <button key={h.id} className="wa-row" onClick={() => nav("/heat")}>
+                    <span className="ico" style={{ background: "rgba(244,0,9,0.08)", color: "var(--brand)" }}>
+                      <Icon name="local_fire_department" size={17} />
+                    </span>
+                    <span className="body">
+                      <h4 style={{ fontSize: 13 }}>{h.title}</h4>
+                      <small>
+                        {h.channel} · heat {h.heat} · {h.velocity >= 0 ? "▲" : "▼"} {Math.abs(h.velocity)}%
+                      </small>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : (
+            <section className="wa-card" data-hint="w-dash">
               <h3>My dashboard</h3>
-              <button className="wa-link-btn" onClick={() => nav("/analytics")}>
-                Full analytics
-              </button>
-            </div>
-            <p className="wa-sub" style={{ marginBottom: 12 }}>
-              {plant ? "Plant productivity" : support ? "Service desk" : "Communications reach"}
-            </p>
-            <div className="wa-grid wa-g2" style={{ gap: 10 }}>
-              {headlineCards.slice(0, 4).map((c) => (
-                <div key={c.id} style={{ background: "var(--w-bg)", borderRadius: 10, padding: "10px 12px" }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>{c.value}</div>
-                  <div style={{ fontSize: 11.5, color: "var(--w-muted)", fontWeight: 600 }}>{c.label}</div>
-                </div>
-              ))}
-            </div>
-          </section>
+              <p className="wa-sub" style={{ marginBottom: 12 }}>Your own numbers</p>
+              <div className="wa-grid wa-g2" style={{ gap: 10 }}>
+                {[
+                  { v: `${user.leaveDays}d`, l: "Leave balance" },
+                  { v: `${user.training}%`, l: "Training complete" },
+                  { v: String(manager ? pendingCount : openTickets), l: manager ? "Waiting on you" : "Open requests" },
+                  { v: String(myAnnouncements.length), l: "Announcements" },
+                ].map((c) => (
+                  <div key={c.l} style={{ background: "rgba(17,17,20,0.035)", borderRadius: 11, padding: "10px 12px" }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>{c.v}</div>
+                    <div style={{ fontSize: 11.5, color: "var(--w-muted)", fontWeight: 600 }}>{c.l}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </>

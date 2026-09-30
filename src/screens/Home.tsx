@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon, TopBar } from "../ui";
 import { newsItems } from "../data";
-import { isAdmin, isManager, isPlant, isSupport } from "../personas";
+import { isAdmin, isHR, isManager, isPlant, isSupport } from "../personas";
 import { useHub } from "../store";
 import { ImportantAnnouncements, PersonalAnnouncement } from "./Announcements";
 import { CeoTalksCard } from "./CeoTalks";
+import { StockTicker } from "../ticker";
+import { peopleView } from "../hr";
+import { heatTotals, rankedHeat } from "../heat";
 
 export function Home() {
   const nav = useNavigate();
@@ -25,8 +28,20 @@ export function Home() {
   const manager = isManager(user);
   const plant = isPlant(user);
   const support = isSupport(user);
+  const hr = isHR(user);
+  const people = hr ? peopleView({ dept: "all", zone: "all", period: "12M" }) : null;
+  const heatNow = hr ? heatTotals() : null;
+  const hottest = hr ? rankedHeat()[0] : null;
 
-  const actions = plant
+  const actions = hr
+    ? [
+        { hint: "qa-people", label: "People analytics", icon: "insights", bg: "#fef2f2", color: "#f40009", to: "/people", dot: true },
+        { hint: "qa-heat", label: "Engagement heat", icon: "local_fire_department", bg: "#fffbeb", color: "#d97706", to: "/heat" },
+        { hint: "qa-comms", label: "Comms reach", icon: "monitoring", bg: "#eff6ff", color: "#2563eb", to: "/analytics" },
+        { hint: "qa-ann", label: "Announce", icon: "campaign", bg: "#ecfdf5", color: "#059669", to: "/announcements" },
+        { hint: "qa-leave", label: "Request Leave", icon: "calendar_month", bg: "#f5f3ff", color: "#7c3aed", to: "/services/leave" },
+      ]
+    : plant
     ? [
         { hint: "qa-attendance", label: "Punch / Attendance", icon: "schedule", bg: "#ecfdf5", color: "#059669", to: "/services/attendance", dot: true },
         { hint: "qa-leave", label: "Request Leave", icon: "calendar_month", bg: "#fef2f2", color: "#f40009", to: "/services/leave" },
@@ -50,7 +65,14 @@ export function Home() {
           { hint: "qa-admin", label: "Admin", icon: "admin_panel_settings", bg: "#0f172a", color: "#fff", to: "/admin" },
         ];
 
-  const systems = plant
+  const systems = hr
+    ? [
+        { id: "hr", name: "HR Portal", sub: "People records", bg: "#fef2f2", c: "#a50e0e", t: "HR" },
+        { id: "pbi", name: "Power BI", sub: "People dashboards", bg: "#ecfdf5", c: "#059669", t: "PBI" },
+        { id: "lms", name: "LMS", sub: "Compliance modules", bg: "#eff6ff", c: "#185ABC", t: "LMS" },
+        { id: "teams", name: "Microsoft Teams", sub: "Viva Engage", bg: "#e8f0fe", c: "#5b5fc7", t: "MS" },
+      ]
+    : plant
     ? [
         { id: "sap", name: "SAP ERP", sub: "Line & supply", bg: "#fef2f2", c: "#f40009", t: "SAP" },
         { id: "snow", name: "ServiceNow", sub: "Plant tickets", bg: "#ecfdf5", c: "#137333", t: "SN" },
@@ -101,9 +123,46 @@ export function Home() {
           )}
         </div>
 
+        <StockTicker variant="mobile" />
+
         <PersonalAnnouncement />
 
-        {manager ? (
+        {hr && people && heatNow && hottest ? (
+          <div className="card alert" style={{ marginTop: 14 }} data-hint="home-people">
+            <div className="alert-head">
+              <span className="alert-label">People pulse</span>
+              <span className="pill">{heatNow.attention} need a response</span>
+            </div>
+            <h2 className="h2" style={{ margin: "8px 0 4px" }}>
+              {people.headcount.toLocaleString("en-IN")} employees · {people.attrition}% attrition
+            </h2>
+            <p className="muted" style={{ margin: 0 }}>
+              Hottest now: “{hottest.title}” — heat {hottest.heat}
+            </p>
+            <div className="row">
+              <button className="cta" style={{ flex: 1 }} onClick={() => nav("/people")}>
+                People analytics <Icon name="arrow_forward" size={18} />
+              </button>
+              <button className="icon-round" onClick={() => nav("/heat")} aria-label="Engagement heat">
+                <Icon name="local_fire_department" />
+              </button>
+            </div>
+            <div className="stats">
+              <button className="stat" onClick={() => nav("/people")}>
+                <span>Training</span>
+                <b className={people.training >= 90 ? "good" : ""}>{people.training}%</b>
+              </button>
+              <button className="stat" onClick={() => nav("/people")}>
+                <span>eNPS</span>
+                <b>{people.eNPS > 0 ? `+${people.eNPS}` : people.eNPS}</b>
+              </button>
+              <button className="stat" onClick={() => nav("/heat")}>
+                <span>Heating up</span>
+                <b className="bad">{heatNow.heating}</b>
+              </button>
+            </div>
+          </div>
+        ) : manager ? (
           <div className="card alert" style={{ marginTop: 14 }}>
             <div className="alert-head">
               <span className="alert-label">Corporate queue</span>

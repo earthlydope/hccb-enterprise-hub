@@ -4,7 +4,6 @@ import { Icon, ScreenHeader } from "../ui";
 import {
   amaQuestions,
   apps,
-  ceo,
   copilotAnswer,
   formatDay,
   knowledgeDocs,
@@ -42,7 +41,7 @@ export function Search() {
       .map((q) => ({
         kind: "CEO Talks",
         title: q.text,
-        snippet: q.answer ? `${ceo.name}: ${q.answer}` : `${q.upvotes} upvotes · ${q.status}`,
+        snippet: q.answer ? `Illustrative answer: ${q.answer}` : `${q.upvotes} upvotes · ${q.status}`,
         source: "Ask Me Anything",
         updated: q.answeredAt ?? "Open",
         to: "/ceo-talks",

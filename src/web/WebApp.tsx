@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "../ui";
 import { toast, useHub } from "../store";
-import { isAdmin } from "../personas";
+import { isAdmin, isHR } from "../personas";
 import { localisedAnnouncement, matchReasons, formatDay } from "../data";
+import { heatTotals } from "../heat";
 import { WebHintStage } from "./guide";
 import { WebHome } from "./Home";
 import { WebAnalytics } from "./Analytics";
+import { RequireHR, WebEngagementHeat, WebPeopleAnalytics } from "./People";
+import { StockTicker } from "../ticker";
 import {
   WebAnnouncementDetail,
   WebAnnouncements,
@@ -32,7 +35,8 @@ type NavItem = { to: string; label: string; icon: string; badge?: number };
 
 function useNavModel(): { group: string; items: NavItem[] }[] {
   const { pendingCount, unread, user, needsAck } = useHub();
-  return [
+  const heatAttention = heatTotals().attention;
+  const model = [
     {
       group: "For you",
       items: [
@@ -72,11 +76,28 @@ function useNavModel(): { group: string; items: NavItem[] }[] {
       items: [
         { to: "/knowledge", label: "Policies & SOPs", icon: "menu_book" },
         { to: "/copilot", label: "AI Assistant", icon: "auto_awesome" },
-        { to: "/analytics", label: "Analytics Dashboard", icon: "monitoring" },
         ...(isAdmin(user) ? [{ to: "/admin", label: "Admin Console", icon: "admin_panel_settings" }] : []),
       ],
     },
+    // Full analytics is HR-only.
+    ...(isHR(user)
+      ? [
+          {
+            group: "People insights",
+            items: [
+              { to: "/people", label: "People analytics", icon: "insights" },
+              { to: "/heat", label: "Engagement heat", icon: "local_fire_department", badge: heatAttention || undefined },
+              { to: "/analytics", label: "Comms analytics", icon: "monitoring" },
+            ],
+          },
+        ]
+      : []),
   ];
+  if (isHR(user)) {
+    const insights = model.pop()!;
+    model.splice(1, 0, insights);
+  }
+  return model;
 }
 
 function Sidebar() {
@@ -273,7 +294,10 @@ export function WebApp() {
       <div className="wa">
       <Sidebar />
       <div className="wa-main">
-        <TopBar />
+        <div className="wa-head">
+          <StockTicker variant="web" />
+          <TopBar />
+        </div>
         <div className="wa-body">
           <Routes>
             <Route path="/" element={<WebHome />} />
@@ -294,7 +318,10 @@ export function WebApp() {
             <Route path="/knowledge" element={<WebKnowledge />} />
             <Route path="/knowledge/:id" element={<WebKnowledgeDetail />} />
             <Route path="/copilot" element={<WebCopilot />} />
-            <Route path="/analytics" element={<WebAnalytics />} />
+            <Route path="/analytics" element={<RequireHR><WebAnalytics /></RequireHR>} />
+            <Route path="/people" element={<WebPeopleAnalytics />} />
+            <Route path="/hr-analytics" element={<WebPeopleAnalytics />} />
+            <Route path="/heat" element={<WebEngagementHeat />} />
             <Route path="/search" element={<WebSearch />} />
             <Route path="/notifications" element={<WebNotifications />} />
             <Route path="/profile" element={<WebProfile />} />

@@ -21,6 +21,7 @@ import { Search } from "./screens/Search";
 import { Copilot } from "./screens/Copilot";
 import { AnnouncementDetail, AnnouncementPopup, Announcements } from "./screens/Announcements";
 import { CeoTalks } from "./screens/CeoTalks";
+import { MobileHeat, MobilePeople, MobileRequireHR } from "./screens/People";
 import {
   Admin,
   Analytics,
@@ -79,7 +80,10 @@ function Shell() {
         <Route path="/learning" element={<Learning />} />
         <Route path="/communities" element={<Communities />} />
         <Route path="/recognition" element={<Recognition />} />
-        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/analytics" element={<MobileRequireHR title="Comms analytics"><Analytics /></MobileRequireHR>} />
+        <Route path="/people" element={<MobilePeople />} />
+        <Route path="/hr-analytics" element={<MobilePeople />} />
+        <Route path="/heat" element={<MobileHeat />} />
         <Route path="/sales" element={<HubPage kind="sales" />} />
         <Route path="/manufacturing" element={<HubPage kind="mfg" />} />
         <Route path="/supply-chain" element={<HubPage kind="sc" />} />

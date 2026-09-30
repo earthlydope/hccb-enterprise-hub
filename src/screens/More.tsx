@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icon, ScreenHeader, TopBar } from "../ui";
 import {
-  analyticsCards,
   announcementWindow,
   announcements,
   apps,
@@ -16,7 +15,9 @@ import {
   recognitionFeed,
 } from "../data";
 import { toast, useHub } from "../store";
-import { personas } from "../personas";
+import { isHR, personas } from "../personas";
+import { byAge, byFormat, byFunction, byHour, byLanguage, byZone, headlineCards, reachHeadline } from "../analytics";
+import { BarList, Funnel, HourChart } from "../web/charts";
 
 export function Profile() {
   const { dispatch, user, state } = useHub();
@@ -103,13 +104,31 @@ export function Profile() {
             <div className="tiny">{user.training}% complete</div>
           </div>
         </button>
-        <button className="list-item" onClick={() => nav("/analytics")}>
-          <Icon name="monitoring" />
-          <div>
-            <h4>Analytics</h4>
-            <div className="tiny">Volume, OEE, tickets</div>
-          </div>
-        </button>
+        {isHR(user) && (
+          <>
+            <button className="list-item" onClick={() => nav("/people")}>
+              <Icon name="insights" />
+              <div>
+                <h4>People analytics</h4>
+                <div className="tiny">Headcount, attrition, training, hiring</div>
+              </div>
+            </button>
+            <button className="list-item" onClick={() => nav("/heat")}>
+              <Icon name="local_fire_department" />
+              <div>
+                <h4>Engagement heat</h4>
+                <div className="tiny">What employees are responding to</div>
+              </div>
+            </button>
+            <button className="list-item" onClick={() => nav("/analytics")}>
+              <Icon name="monitoring" />
+              <div>
+                <h4>Comms analytics</h4>
+                <div className="tiny">Reach, open rate, read-through</div>
+              </div>
+            </button>
+          </>
+        )}
         <div className="field" style={{ marginTop: 14 }}>
           <label>Language</label>
           <select
@@ -146,7 +165,7 @@ export function Notifications() {
   const { slice, dispatch } = useHub();
   const nav = useNavigate();
   const [cat, setCat] = useState("All");
-  const cats = ["All", "Announcements", "Leadership", "Approvals", "Company", "Learning", "Service Requests"];
+  const cats = ["All", "Insights", "Announcements", "Leadership", "Approvals", "Company", "Learning", "Service Requests"];
   const items = slice.notifications.filter((n) => cat === "All" || n.category === cat);
   return (
     <>
@@ -457,22 +476,70 @@ export function Recognition() {
 }
 
 export function Analytics() {
-  const nav = useNavigate();
+  const [cut, setCut] = useState<"Zone" | "Function" | "Age group" | "Language">("Zone");
+  const rows = cut === "Zone" ? byZone : cut === "Function" ? byFunction : cut === "Age group" ? byAge : byLanguage;
   return (
     <>
-      <ScreenHeader title="Analytics" />
+      <ScreenHeader title="Comms analytics" />
       <div className="scroll">
-        <div className="list">
-          {analyticsCards.map((c) => (
-            <button key={c.id} className="list-item" onClick={() => nav("/apps/pbi")}>
-              <div>
-                <div className="tiny">{c.hint}</div>
-                <h4>{c.title}</h4>
-                <b className={c.tone === "good" ? "good" : c.tone === "bad" ? "bad" : ""} style={{ fontSize: 22 }}>
-                  {c.value}
-                </b>
-              </div>
+        <div className="between" style={{ alignItems: "baseline" }}>
+          <h1 className="h1" style={{ fontSize: 24, margin: 0 }}>How comms land</h1>
+          <span className="tag high">Illustrative</span>
+        </div>
+        <p className="tiny" style={{ margin: "4px 0 12px" }}>Reach, opens and read-through · last 30 days</p>
+        <div className="m-kpis">
+          {headlineCards.map((c) => (
+            <div key={c.id} className="card m-kpi">
+              <span>{c.label}</span>
+              <b>{c.value}</b>
+              <small>{c.sub}</small>
+            </div>
+          ))}
+        </div>
+        <div className="card m-chart">
+          <b>From published to acted on</b>
+          <small>All communications</small>
+          <Funnel
+            steps={[
+              { label: "Audience", value: reachHeadline.audience },
+              { label: "Reached", value: reachHeadline.reached },
+              { label: "Opened", value: reachHeadline.opened },
+              { label: "Read", value: reachHeadline.readThrough },
+              { label: "Acted", value: reachHeadline.acted },
+            ]}
+          />
+        </div>
+        <div className="filters">
+          {(["Zone", "Function", "Age group", "Language"] as const).map((c) => (
+            <button key={c} className={cut === c ? "filter on" : "filter"} onClick={() => setCut(c)}>
+              {c}
             </button>
+          ))}
+        </div>
+        <div className="card m-chart m-bars">
+          <b>Open rate by {cut.toLowerCase()}</b>
+          <small>Share of the targeted audience that opened</small>
+          <BarList rows={rows} />
+        </div>
+        <div className="card m-chart">
+          <b>When people read</b>
+          <small>Opens by hour · peaks highlighted</small>
+          <HourChart data={byHour} />
+        </div>
+        <div className="section-title">
+          <h3>Which format works</h3>
+        </div>
+        <div className="list">
+          {byFormat.map((f) => (
+            <div key={f.id} className="list-item">
+              <div style={{ flex: 1 }}>
+                <h4 style={{ fontSize: 15 }}>{f.format}</h4>
+                <div className="tiny">
+                  {f.openRate}% open · {f.completion}% completion · {f.interactions.toLocaleString("en-IN")} interactions
+                </div>
+              </div>
+              <span className={`tag ${f.verdict === "Working" ? "done" : f.verdict === "Fading" ? "crit" : "high"}`}>{f.verdict}</span>
+            </div>
           ))}
         </div>
       </div>
@@ -590,7 +657,7 @@ export function HubPage({ kind }: { kind: "sales" | "mfg" | "sc" }) {
       title: "Sales Hub",
       items: [
         ["Q3 Sales Playbook", "/knowledge/playbook-q3"],
-        ["Territory analytics", "/analytics"],
+        ["Territory analytics", "/apps/pbi"],
         ["CRM", "/apps/crm"],
         ["DMS", "/apps/dms"],
       ],
@@ -600,7 +667,7 @@ export function HubPage({ kind }: { kind: "sales" | "mfg" | "sc" }) {
       items: [
         ["Plant Safety SOP", "/knowledge/sop-plant-safety"],
         ["Plant news", "/news/n3"],
-        ["Productivity", "/analytics"],
+        ["Productivity", "/apps/pbi"],
         ["Service requests", "/services/it"],
       ],
     },

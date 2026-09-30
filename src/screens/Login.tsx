@@ -6,7 +6,7 @@ import { toast, useHub } from "../store";
 export function Login({ onIn }: { onIn: () => void }) {
   const { dispatch } = useHub();
   const nav = useNavigate();
-  const [pick, setPick] = useState("avinash");
+  const [pick, setPick] = useState("ananya");
   const selected = personas.find((p) => p.id === pick) ?? personas[0];
 
   return (
@@ -17,7 +17,7 @@ export function Login({ onIn }: { onIn: () => void }) {
         <h1 className="h1">
           Choose a user
         </h1>
-        <p className="muted">Three lanes: Corporate + Admin, Plant floor, and Employee Support.</p>
+        <p className="muted">Four personas: HR analytics, Corporate + Admin, Plant floor, and Employee Support.</p>
         <div className="persona-list">
           {personas.map((p) => (
             <button

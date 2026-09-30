@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Icon } from "../ui";
+import { Icon, Monogram } from "../ui";
+import { CeoProfile, IllustrativeNote } from "../screens/CeoTalks";
 import { toast, useHub } from "../store";
 import { isManager, personas } from "../personas";
 import {
@@ -13,6 +14,7 @@ import {
   apps,
   audienceLabel,
   ceo,
+  AMA_ANSWER_BY,
   communities,
   copilotAnswer,
   DEMO_NOW,
@@ -196,7 +198,7 @@ export function WebLeadership() {
         <div>
           <section className="wa-ceo">
             <div className="wa-ceo-head">
-              <img src={ceo.avatar} alt={ceo.name} />
+              <Monogram initials={ceo.initials} size={48} />
               <div>
                 <b>{ceo.name}</b>
                 <small>{ceo.title}</small>
@@ -300,6 +302,7 @@ export function WebLeadership() {
             ))}
           </div>
 
+          <IllustrativeNote />
           {questions.length === 0 && (
             <div className="wa-card wa-empty">
               {tab === "My questions" ? "You have not asked anything in this session yet." : "Nothing here yet."}
@@ -333,7 +336,7 @@ export function WebLeadership() {
                   {q.answer && (
                     <div className="ama-answer" style={{ background: "var(--w-bg)" }}>
                       <b>
-                        <img src={ceo.avatar} alt="" /> {ceo.name} · {q.answeredAt}
+                        <Icon name="verified" size={14} /> {AMA_ANSWER_BY} · {q.answeredAt}
                       </b>
                       {q.answer}
                     </div>
@@ -345,6 +348,9 @@ export function WebLeadership() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <section className="wa-card" data-hint="ceo-profile">
+            <CeoProfile />
+          </section>
           <section className="wa-card">
             <h3>Leadership notes</h3>
             <p className="wa-sub" style={{ marginBottom: 8 }}>Written messages on the record</p>
@@ -1075,7 +1081,7 @@ export function WebNotifications() {
   const { slice, dispatch } = useHub();
   const nav = useNavigate();
   const [cat, setCat] = useState("All");
-  const cats = ["All", "Announcements", "Leadership", "Approvals", "Company", "Learning", "Service Requests"];
+  const cats = ["All", "Insights", "Announcements", "Leadership", "Approvals", "Company", "Learning", "Service Requests"];
   const items = slice.notifications.filter((n) => cat === "All" || n.category === cat);
   return (
     <>
@@ -1230,7 +1236,7 @@ export function WebSearch() {
       .map((x) => ({
         kind: "CEO Talks",
         title: x.text,
-        snippet: x.answer ? `${ceo.name}: ${x.answer}` : `${x.upvotes} upvotes · ${x.status}`,
+        snippet: x.answer ? `Illustrative answer: ${x.answer}` : `${x.upvotes} upvotes · ${x.status}`,
         meta: x.answeredAt ?? "Open for upvotes",
         to: "/leadership",
       }));
@@ -1537,7 +1543,7 @@ const hubMap = {
     owner: "Sales Excellence",
     items: [
       ["Q3 Sales Playbook", "/knowledge/playbook-q3", "menu_book"],
-      ["Territory analytics", "/analytics", "monitoring"],
+      ["Territory analytics", "/apps/pbi", "monitoring"],
       ["Sales CRM", "/apps/crm", "storefront"],
       ["Distributor Management", "/apps/dms", "local_shipping"],
     ],
@@ -1549,7 +1555,7 @@ const hubMap = {
     items: [
       ["Plant Safety SOP", "/knowledge/sop-plant-safety", "health_and_safety"],
       ["Plant news", "/news/n3", "newspaper"],
-      ["Line productivity", "/analytics", "monitoring"],
+      ["Line productivity", "/apps/pbi", "monitoring"],
       ["Raise a plant ticket", "/services/it", "build"],
     ],
   },

@@ -102,6 +102,19 @@ export function ScreenHeader({ title, back }: { title: string; back?: boolean })
   );
 }
 
+/** Monogram used for the CEO — no approved headshot is bundled with the prototype. */
+export function Monogram({ initials, size = 44, className }: { initials: string; size?: number; className?: string }) {
+  return (
+    <span
+      className={className ? `monogram ${className}` : "monogram"}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
+      aria-hidden
+    >
+      {initials}
+    </span>
+  );
+}
+
 export function Empty({ text }: { text: string }) {
   return (
     <div className="card" style={{ textAlign: "center", color: "var(--muted)" }}>

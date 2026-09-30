@@ -138,6 +138,38 @@ export function hintFor(
     "admin-confirm": { title: "Confirm policy", body: "Marks governance Published for the audit trail." },
     "pay-download": { title: "Download", body: "Demo file named for this employee." },
 
+    /* ---------------- HR analytics persona ---------------- */
+    "login-ananya": {
+      title: "HR analytics",
+      body: "The persona with full analytics — people, engagement heat and communications reach.",
+    },
+    "home-people": { title: "People pulse", body: "Headcount, attrition and the hottest conversation — computed live from the people and heat models." },
+    "qa-people": { title: "People analytics", body: "Keka-style workforce analytics: headcount, attrition, training, hiring, attendance." },
+    "qa-heat": { title: "Engagement heat", body: "Which posts and discussions are gathering momentum, and which need a response." },
+    "qa-comms": { title: "Comms reach", body: "Who a message reached, opened and finished — by zone, function, age and hour." },
+    "qa-ann": { title: "Announcements", body: "Targeted notices, acknowledgements and the popup engine." },
+    "m-hr-filters": { title: "Cut the workforce", body: "Department, zone and period — every tile and chart below recomputes." },
+    "m-hr-tabs": { title: "Analytics areas", body: "Overview, workforce, retention, learning and hiring — the same model as the web dashboard." },
+    "m-heat-list": { title: "Heat ranking", body: "Tap a conversation for sentiment, momentum and the recommended action." },
+    "hr-filters": { title: "Dynamic filters", body: "Department, zone and period. Every KPI, chart, table and read-out recomputes from the model." },
+    "hr-kpi": { title: "Headline workforce KPIs", body: "Headcount, attrition, compliance, eNPS, absenteeism and hiring for the current cut." },
+    "hr-tabs": { title: "HRMS analytics areas", body: "The six areas an HR team works in daily — the same structure as Keka and similar HRMS portals." },
+    "hr-movement": { title: "Headcount movement", body: "Joiners against leavers each month. Hover a column for the exact numbers." },
+    "hr-attr-trend": { title: "Attrition trend", body: "Monthly exits annualised, against a 12% target." },
+    "hr-generations": { title: "Generations", body: "The age mix Communications asked for — it decides format, channel and tone." },
+    "hr-risk": { title: "Flight-risk drivers", body: "Predicted from tenure, pay position, pulse scores and manager changes — where retention effort should go." },
+    "hr-modules": { title: "Compliance matrix", body: "Every mandatory module by department, coloured against target." },
+    "hr-dept-table": { title: "Departments at a glance", body: "Attrition, training, eNPS and flight risk side by side, coloured against target." },
+    "heat-kpi": { title: "Heating up", body: "Items whose engagement rose 20% or more in the last day." },
+    "heat-attention": { title: "Needs a response", body: "Rising fast with 30%+ negative sentiment. These are where HR should act first." },
+    "heat-channels": { title: "Channels", body: "AMA questions, Viva Engage threads, announcements, stories, polls and leadership notes." },
+    "heat-list": { title: "Heat ranking", body: "Weighted engagement — comments and shares count most — blended with 24-hour momentum." },
+    "heat-detail": { title: "Why it is hot", body: "Seven-day curve, sentiment, where it is coming from, and the recommended next step." },
+    "heat-matrix": { title: "Topic × zone", body: "Which subjects are running hot in which zone — where a targeted message will land." },
+    "tk-web": { title: "IPO-year ticker", body: "Simulated pre-listing preview. The exchange feed replaces the simulation at listing." },
+    "tk-mobile": { title: "IPO-year ticker", body: "Simulated pre-listing preview — clearly labelled until the exchange feed connects." },
+    "ceo-profile": { title: "Leadership profile", body: "Verified from HCCB's own announcement of the CEO appointment, with the source linked." },
+
     /* ---------------- Landing chooser ---------------- */
     "lz-mobile": {
       title: "Mobile experience",
