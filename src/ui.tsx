@@ -88,7 +88,7 @@ export function TabBar() {
 export function ScreenHeader({ title, back }: { title: string; back?: boolean }) {
   const nav = useNavigate();
   return (
-    <div className="topbar" style={{ paddingTop: 4 }}>
+    <div className="topbar">
       {back !== false && (
         <button className="back" data-hint="nav-back" onClick={() => nav(-1)}>
           <Icon name="chevron_left" />
