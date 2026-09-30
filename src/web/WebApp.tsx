@@ -4,6 +4,7 @@ import { Icon } from "../ui";
 import { toast, useHub } from "../store";
 import { isAdmin } from "../personas";
 import { localisedAnnouncement, matchReasons, formatDay } from "../data";
+import { WebHintStage } from "./guide";
 import { WebHome } from "./Home";
 import { WebAnalytics } from "./Analytics";
 import {
@@ -96,7 +97,7 @@ function Sidebar() {
           <small>Hindustan Coca-Cola Beverages</small>
         </div>
       </div>
-      <nav className="wa-nav">
+      <nav className="wa-nav" data-hint="w-nav">
         {model.map((g) => (
           <div key={g.group}>
             <div className="wa-group">{g.group}</div>
@@ -117,6 +118,7 @@ function Sidebar() {
       <div className="wa-side-foot">
         <button
           className="wa-switch"
+          data-hint="w-switch"
           onClick={() => {
             dispatch({ type: "SET_MODE", mode: "mobile" });
             nav("/");
@@ -138,6 +140,7 @@ function TopBar() {
     <header className="wa-top">
       <form
         className="wa-search"
+        data-hint="w-search"
         onSubmit={(e) => {
           e.preventDefault();
           if (q.trim()) nav(`/search?q=${encodeURIComponent(q.trim())}`);
@@ -154,6 +157,7 @@ function TopBar() {
       <div className="wa-top-right">
         <select
           className="wa-lang"
+          data-hint="w-lang"
           value={state.language}
           aria-label="Language"
           onChange={(e) => dispatch({ type: "LANG", language: e.target.value as typeof state.language })}
@@ -165,11 +169,11 @@ function TopBar() {
         <button className="wa-icon" aria-label="AI Assistant" onClick={() => nav("/copilot")}>
           <Icon name="auto_awesome" size={19} />
         </button>
-        <button className="wa-icon" aria-label="Notifications" onClick={() => nav("/notifications")}>
+        <button className="wa-icon" data-hint="w-alerts" aria-label="Notifications" onClick={() => nav("/notifications")}>
           <Icon name="notifications" size={19} />
           {unread > 0 && <span className="badge">{unread}</span>}
         </button>
-        <button className="wa-me" onClick={() => nav("/profile")}>
+        <button className="wa-me" data-hint="w-me" onClick={() => nav("/profile")}>
           <img src={user.avatar} alt="" />
           <span>
             <b>{user.fullName}</b>
@@ -265,7 +269,8 @@ function WebToasts() {
 
 export function WebApp() {
   return (
-    <div className="wa">
+    <WebHintStage>
+      <div className="wa">
       <Sidebar />
       <div className="wa-main">
         <TopBar />
@@ -303,8 +308,9 @@ export function WebApp() {
           </Routes>
         </div>
       </div>
-      <WebPopup />
-      <WebToasts />
-    </div>
+        <WebPopup />
+        <WebToasts />
+      </div>
+    </WebHintStage>
   );
 }

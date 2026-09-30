@@ -37,6 +37,7 @@ import {
 } from "./screens/More";
 import { WebApp } from "./web/WebApp";
 import { WebLogin } from "./web/Login";
+import { WebHintStage } from "./web/guide";
 
 function Shell() {
   const { state, ready } = useHub();
@@ -155,7 +156,12 @@ export default function App() {
   if (!ready) return null;
 
   // No shell chosen yet — show the entry chooser.
-  if (!state.mode) return <Landing />;
+  if (!state.mode)
+    return (
+      <WebHintStage>
+        <Landing />
+      </WebHintStage>
+    );
 
   if (state.mode === "web") {
     // The web experience needs a signed-in identity too.

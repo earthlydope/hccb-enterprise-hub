@@ -32,7 +32,7 @@ export function WebAnalytics() {
         Cut by zone, function, age group, language, device and hour of day.
       </p>
 
-      <div className="wa-pill-row">
+      <div className="wa-pill-row" data-hint="w-analytics-range">
         {ranges.map((r) => (
           <button key={r} className={range === r ? "wa-pill on" : "wa-pill"} onClick={() => setRange(r)}>
             {r}
@@ -63,7 +63,7 @@ export function WebAnalytics() {
         <h2>From published to acted on</h2>
         <span className="wa-sub">{range} · all communications</span>
       </div>
-      <div className="wa-card">
+      <div className="wa-card" data-hint="w-analytics-funnel">
         <Funnel
           steps={[
             { label: "Audience", value: reachHeadline.audience },
@@ -87,7 +87,7 @@ export function WebAnalytics() {
               <h3>Open rate by {cut.toLowerCase()}</h3>
               <p className="wa-sub">Share of the targeted audience that opened at least one item</p>
             </div>
-            <div className="wa-pill-row" style={{ margin: 0 }}>
+            <div className="wa-pill-row" style={{ margin: 0 }} data-hint="w-analytics-cut">
               {(["Zone", "Function", "Age group", "Language"] as const).map((c) => (
                 <button key={c} className={cut === c ? "wa-pill on" : "wa-pill"} onClick={() => setCut(c)}>
                   {c}
@@ -118,7 +118,7 @@ export function WebAnalytics() {
           )}
         </div>
 
-        <div className="wa-card">
+        <div className="wa-card" data-hint="w-analytics-device">
           <h3>Device mix</h3>
           <p className="wa-sub" style={{ marginBottom: 14 }}>Where employees actually read</p>
           <Donut data={byDevice} />
@@ -134,7 +134,7 @@ export function WebAnalytics() {
         <h2>When people actually read</h2>
         <span className="wa-sub">Opens by hour · peaks highlighted</span>
       </div>
-      <div className="wa-card">
+      <div className="wa-card" data-hint="w-analytics-hour">
         <HourChart data={byHour} />
         <p className="wa-sub" style={{ marginTop: 12 }}>
           Two peaks — 09:00 at shift start and 18:00 on the commute. A midday send loses roughly
@@ -147,7 +147,7 @@ export function WebAnalytics() {
         <h2>Which format of communication works</h2>
         <span className="wa-sub">Same audience, different treatment</span>
       </div>
-      <div className="wa-card">
+      <div className="wa-card" data-hint="w-analytics-format">
         <table className="wa-table">
           <thead>
             <tr>
@@ -232,7 +232,7 @@ export function WebAnalytics() {
           </table>
         </div>
 
-        <div className="wa-card">
+        <div className="wa-card" data-hint="w-analytics-insight">
           <h3>What this is telling you</h3>
           <p className="wa-sub" style={{ marginBottom: 6 }}>Generated from the cuts above</p>
           {insights.map((i) => (

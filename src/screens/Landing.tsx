@@ -53,7 +53,7 @@ export function Landing() {
 
       <section className="lz-picker">
         {/* ---- Mobile ---- */}
-        <button className="lz-card" onClick={() => enter("mobile")}>
+        <button className="lz-card" data-hint="lz-mobile" onClick={() => enter("mobile")}>
           <div className="lz-card-head">
             <span className="lz-tag">
               <Icon name="smartphone" size={15} /> Mobile app
@@ -123,7 +123,7 @@ export function Landing() {
         </button>
 
         {/* ---- Web ---- */}
-        <button className="lz-card" onClick={() => enter("web")}>
+        <button className="lz-card" data-hint="lz-web" onClick={() => enter("web")}>
           <div className="lz-card-head">
             <span className="lz-tag">
               <Icon name="desktop_windows" size={15} /> Web application

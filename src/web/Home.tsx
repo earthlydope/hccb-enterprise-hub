@@ -60,7 +60,7 @@ export function WebHome() {
   return (
     <>
       {/* ---------- Personalised greeting ---------- */}
-      <section className="wa-hero">
+      <section className="wa-hero" data-hint="w-hero">
         <div>
           <div className="k">{part}</div>
           <h1>{user.fullName}</h1>
@@ -75,7 +75,7 @@ export function WebHome() {
           </div>
         </div>
         <div className="wa-hero-stats">
-          <button className="wa-hero-stat" onClick={() => nav("/workspace")}>
+          <button className="wa-hero-stat" data-hint="w-hero-stat" onClick={() => nav("/workspace")}>
             <b>{manager ? pendingCount : support ? openTickets : user.leaveDays}</b>
             <span>{manager ? "Pending approvals" : support ? "Open tickets" : "Leave days"}</span>
           </button>
@@ -97,7 +97,7 @@ export function WebHome() {
           All HR services
         </button>
       </div>
-      <div className="wa-actions">
+      <div className="wa-actions" data-hint="w-actions">
         {actions.map((a) => (
           <button key={a.label} className="wa-action" onClick={() => nav(a.to)}>
             <i style={{ background: a.bg, color: a.c }}>
@@ -122,7 +122,7 @@ export function WebHome() {
               Targeted by location, department and role — {cards.length} items
             </span>
           </div>
-          <div className="wa-grid wa-g2">
+          <div className="wa-grid wa-g2" data-hint="w-personal">
             {cards.slice(0, 2).map((c) => (
               <article
                 key={c.id}
@@ -199,7 +199,7 @@ export function WebHome() {
               {needsAck.length > 1 ? "need" : "needs"} your acknowledgement
             </p>
           )}
-          <div className="wa-card flat" style={{ padding: "4px 18px" }}>
+          <div className="wa-card flat" style={{ padding: "4px 18px" }} data-hint="w-ann">
             <div className="wa-list">
               {myAnnouncements.slice(0, 4).map((a) => {
                 const t = localisedAnnouncement(a, state.language);
@@ -226,6 +226,7 @@ export function WebHome() {
                     {a.acknowledge && !acked ? (
                       <button
                         className="wa-cta sm"
+                        data-hint="w-ann-ack"
                         onClick={() => {
                           dispatch({ type: "ACK_ANN", id: a.id });
                           toast(dispatch, "Acknowledgement recorded");
@@ -252,7 +253,7 @@ export function WebHome() {
               Newsroom
             </button>
           </div>
-          <button className="wa-news-hero" onClick={() => nav(`/news/${newsItems[0].id}`)}>
+          <button className="wa-news-hero" data-hint="w-news" onClick={() => nav(`/news/${newsItems[0].id}`)}>
             <img src="/people/plant.jpg" alt="" />
             <div className="b">
               <span className="tag crit">{newsItems[0].category}</span>
@@ -281,7 +282,7 @@ export function WebHome() {
         {/* ================= RIGHT ================= */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* ---- CEO Talks ---- */}
-          <section className="wa-ceo">
+          <section className="wa-ceo" data-hint="w-ceo">
             <div className="wa-ceo-head">
               <img src={ceo.avatar} alt={ceo.name} />
               <div>
@@ -298,6 +299,7 @@ export function WebHome() {
             </p>
             <form
               className="wa-ceo-ask"
+              data-hint="w-ceo-ask"
               onSubmit={(e) => {
                 e.preventDefault();
                 const text = ask.trim();
@@ -351,7 +353,7 @@ export function WebHome() {
           </section>
 
           {/* ---- Upcoming ---- */}
-          <section className="wa-card">
+          <section className="wa-card" data-hint="w-events">
             <h3>Upcoming & celebrations</h3>
             <p className="wa-sub" style={{ marginBottom: 10 }}>Next 7 days</p>
             <div className="wa-list">
@@ -377,7 +379,7 @@ export function WebHome() {
           </section>
 
           {/* ---- My applications ---- */}
-          <section className="wa-card">
+          <section className="wa-card" data-hint="w-apps">
             <h3>My applications</h3>
             <p className="wa-sub" style={{ marginBottom: 12 }}>Single sign-on · no second login</p>
             <div className="wa-grid wa-g3" style={{ gap: 10 }}>
@@ -406,7 +408,7 @@ export function WebHome() {
           </section>
 
           {/* ---- My dashboard ---- */}
-          <section className="wa-card">
+          <section className="wa-card" data-hint="w-dash">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <h3>My dashboard</h3>
               <button className="wa-link-btn" onClick={() => nav("/analytics")}>

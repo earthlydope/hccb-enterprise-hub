@@ -3,9 +3,9 @@ import { useLocation } from "react-router-dom";
 import { isAdmin, isManager, isPlant, type Persona } from "./personas";
 import { useHub } from "./store";
 
-type HintCopy = { title: string; body: string };
+export type HintCopy = { title: string; body: string };
 
-function hintFor(
+export function hintFor(
   id: string,
   user: Persona,
   pendingCount: number,
@@ -137,6 +137,43 @@ function hintFor(
     "profile-switch": { title: "Switch user", body: "Loads that lane’s Home, tickets, and leave." },
     "admin-confirm": { title: "Confirm policy", body: "Marks governance Published for the audit trail." },
     "pay-download": { title: "Download", body: "Demo file named for this employee." },
+
+    /* ---------------- Landing chooser ---------------- */
+    "lz-mobile": {
+      title: "Mobile experience",
+      body: "The phone build for factory, warehouse and market colleagues — the largest part of the workforce.",
+    },
+    "lz-web": {
+      title: "Web experience",
+      body: "The full intranet for desks and leadership, including the communications analytics.",
+    },
+
+    /* ---------------- Web application ---------------- */
+    "w-nav": { title: "Task-led navigation", body: "Grouped by what people came to do, not by the org chart. Departments own the content behind each entry." },
+    "w-search": { title: "Plain-language search", body: "One box across announcements, policies, news, people and apps — permission-trimmed to this user." },
+    "w-lang": { title: "Language", body: "Switches interface copy and every translated announcement for this employee." },
+    "w-alerts": { title: "Notifications", body: unread ? `${unread} unread for ${user.firstName}.` : "Inbox is unique to this signed-in user." },
+    "w-me": { title: "Identity", body: `${user.fullName} · ${user.department} · ${user.location}. Everything on the page is targeted from these attributes.` },
+    "w-switch": { title: "Switch experience", body: "Same session, same data — rendered for a phone instead." },
+    "w-hero": { title: "Personalised greeting", body: `Name, location and department drive what the rest of the page shows ${user.firstName}.` },
+    "w-hero-stat": { title: "Live counts", body: mgr ? `${pendingCount} approvals sit on this account right now.` : "Counts come from this user's own record, not a static tile." },
+    "w-actions": { title: "One-click actions", body: "The five requests that used to move by email — leave, IT, payslip, travel and internal jobs." },
+    "w-personal": { title: "Targeted to this person", body: `Generated from ${user.firstName}'s lane, ${user.department} and ${user.location} — the chips show why each card was matched.` },
+    "w-ann": { title: "Important announcements", body: "Priority, owner and expiry come from the targeting rules. Critical notices carry an acknowledgement." },
+    "w-ann-ack": { title: "Acknowledge", body: "Records this employee against the mandatory notice and clears the warning." },
+    "w-ceo": { title: "CEO Talks", body: "Ask Me Anything for the townhall. Questions can be anonymous; top-voted ones are answered live." },
+    "w-ceo-ask": { title: "Ask the CEO", body: "Posts straight from the home page into the AMA queue under this user's name." },
+    "w-events": { title: "Upcoming & celebrations", body: "Events, milestones and birthdays for this person's location and team." },
+    "w-apps": { title: "Application launchpad", body: "SAP, CRM, distributor management, ServiceNow and BI — one launch point, no second login." },
+    "w-dash": { title: "My dashboard", body: "The function's card — communications reach here, plant productivity for a factory account." },
+    "w-news": { title: "Company news", body: "Published once, targeted by location and function, and measured for reach." },
+    "w-analytics-range": { title: "Reporting window", body: "Every cut on the page re-reads against this period." },
+    "w-analytics-funnel": { title: "Published to acted on", body: "Where the audience drops off. The steepest fall is opened to read-through — a length and format problem, not distribution." },
+    "w-analytics-cut": { title: "Cut the audience", body: "Zone, function, age group or language — the four cuts Communications asked for." },
+    "w-analytics-device": { title: "Device mix", body: "Three in four opens are on a phone. Plant TV screens reach the shift floor that never opens a laptop." },
+    "w-analytics-hour": { title: "When people read", body: "Two peaks — 09:00 at shift start and 18:00 on the commute. Midday sends lose roughly half the opens." },
+    "w-analytics-format": { title: "Which format works", body: "Same audience, different treatment. Ask Me Anything and polls out-perform “Did you know” four to one on interaction." },
+    "w-analytics-insight": { title: "Read-out", body: "The written conclusion from each cut, so the numbers do not have to be interpreted live." },
   };
 
   return table[id] ?? null;

@@ -831,3 +831,60 @@
   .wl-pitch ul { display: none; }
   .wl-form { padding: 28px 24px 40px; }
 }
+
+/* ==========================  WEB HOVER GUIDE  ========================== */
+
+.whint {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 55;
+}
+.whint-spot {
+  position: absolute;
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #f40009;
+  animation: whint-in 0.16s ease;
+}
+.whint-svg { position: absolute; inset: 0; overflow: visible; }
+.whint-curve {
+  fill: none;
+  stroke: #f40009;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: whint-draw 0.45s ease forwards;
+}
+.whint-card {
+  position: absolute;
+  background: #1c1c1e;
+  color: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+  animation: whint-in 0.18s ease forwards;
+}
+.whint-card b {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  margin-bottom: 4px;
+}
+.whint-card span {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: -0.008em;
+}
+@keyframes whint-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes whint-draw { to { stroke-dashoffset: 0; } }
+
+@media (max-width: 900px) {
+  .whint { display: none; }
+}
