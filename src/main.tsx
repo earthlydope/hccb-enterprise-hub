@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { HubProvider } from "./store";
 import "./index.css";
+import "./web.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

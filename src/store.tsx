@@ -63,7 +63,11 @@ export type UserSlice = {
   amaRegistered: string[];
 };
 
+export type Mode = "mobile" | "web";
+
 type State = {
+  /** Which shell the visitor chose on the landing page. null = show the chooser. */
+  mode: Mode | null;
   session: boolean;
   userId: string;
   language: "English" | "हिन्दी" | "ಕನ್ನಡ";
@@ -213,6 +217,7 @@ function emptyUsers(): Record<string, UserSlice> {
 }
 
 const initial: State = {
+  mode: null,
   session: false,
   userId: defaultPersona.id,
   language: "English",
@@ -225,6 +230,7 @@ const initial: State = {
 
 type Action =
   | { type: "HYDRATE"; state: State }
+  | { type: "SET_MODE"; mode: Mode | null }
   | { type: "LOGIN"; userId: string }
   | { type: "LOGOUT" }
   | { type: "LANG"; language: State["language"] }
@@ -270,12 +276,15 @@ function reducer(state: State, action: Action): State {
       return {
         ...initial,
         ...action.state,
+        mode: action.state.mode ?? null,
         annPaused: action.state.annPaused ?? {},
         users: merged,
         toasts: [],
         userId: action.state.userId && getPersona(action.state.userId).id === action.state.userId ? action.state.userId : defaultPersona.id,
       };
     }
+    case "SET_MODE":
+      return { ...state, mode: action.mode };
     case "LOGIN":
       return { ...state, session: true, userId: action.userId };
     case "LOGOUT":

@@ -1,8 +1,9 @@
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { HintStage } from "./guide";
-import { StatusBar, TabBar } from "./ui";
+import { Icon, StatusBar, TabBar } from "./ui";
 import { useHub } from "./store";
 import { Login } from "./screens/Login";
+import { Landing } from "./screens/Landing";
 import { Home } from "./screens/Home";
 import { Workspace, Payslips, ApprovalDetail } from "./screens/Workspace";
 import {
@@ -17,9 +18,9 @@ import {
 } from "./screens/Services";
 import { Knowledge, KnowledgeDetail } from "./screens/Knowledge";
 import { Search } from "./screens/Search";
+import { Copilot } from "./screens/Copilot";
 import { AnnouncementDetail, AnnouncementPopup, Announcements } from "./screens/Announcements";
 import { CeoTalks } from "./screens/CeoTalks";
-import { Copilot } from "./screens/Copilot";
 import {
   Admin,
   Analytics,
@@ -34,6 +35,8 @@ import {
   Profile,
   Recognition,
 } from "./screens/More";
+import { WebApp } from "./web/WebApp";
+import { WebLogin } from "./web/Login";
 
 function Shell() {
   const { state, ready } = useHub();
@@ -69,6 +72,7 @@ function Shell() {
         <Route path="/announcements" element={<Announcements />} />
         <Route path="/announcements/:id" element={<AnnouncementDetail />} />
         <Route path="/ceo-talks" element={<CeoTalks />} />
+        <Route path="/leadership" element={<CeoTalks />} />
         <Route path="/news" element={<News />} />
         <Route path="/news/:id" element={<NewsDetail />} />
         <Route path="/learning" element={<Learning />} />
@@ -101,11 +105,32 @@ function Toasts() {
   );
 }
 
-export default function App() {
+/** Floating control that returns to the chooser from the mobile shell. */
+function ModeSwitch() {
+  const { dispatch } = useHub();
+  const nav = useNavigate();
+  return (
+    <div className="mode-switch">
+      <button
+        onClick={() => {
+          dispatch({ type: "SET_MODE", mode: "web" });
+          nav("/");
+        }}
+      >
+        <Icon name="desktop_windows" size={16} /> Web app
+      </button>
+      <button onClick={() => dispatch({ type: "SET_MODE", mode: null })}>
+        <Icon name="grid_view" size={16} /> Chooser
+      </button>
+    </div>
+  );
+}
+
+function MobileExperience() {
   const nav = useNavigate();
   const { state, ready } = useHub();
   return (
-    <HintStage>
+    <>
       <div className="device">
         <div className="device-screen">
           <div className="device-notch" />
@@ -120,6 +145,26 @@ export default function App() {
           </Routes>
         </div>
       </div>
+      <ModeSwitch />
+    </>
+  );
+}
+
+export default function App() {
+  const { state, ready } = useHub();
+  if (!ready) return null;
+
+  // No shell chosen yet — show the entry chooser.
+  if (!state.mode) return <Landing />;
+
+  if (state.mode === "web") {
+    // The web experience needs a signed-in identity too.
+    return state.session ? <WebApp /> : <WebLogin />;
+  }
+
+  return (
+    <HintStage>
+      <MobileExperience />
     </HintStage>
   );
 }
